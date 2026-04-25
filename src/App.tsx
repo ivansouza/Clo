@@ -64,6 +64,7 @@ function AppInner() {
   const [input, setInput] = useState('');
   const [isListening, setIsListening] = useState(false);
   const [isCameraActive, setIsCameraActive] = useState(false);
+  const [cameraFacing, setCameraFacing] = useState<'user' | 'environment'>('environment'); // user=frontal, environment=traseira
   const [isStreaming, setIsStreaming] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
@@ -305,7 +306,9 @@ function AppInner() {
       setIsCameraActive(false);
     } else {
       try {
-        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: cameraFacing }
+        });
         setCameraStream(stream);
         setIsCameraActive(true);
       } catch (err: any) {
@@ -315,6 +318,24 @@ function AppInner() {
         } else {
           setErrorVisible("Erro ao acessar a câmera.");
         }
+      }
+    }
+  };
+
+  const switchCamera = async () => {
+    const newFacing = cameraFacing === 'user' ? 'environment' : 'user';
+    setCameraFacing(newFacing);
+    
+    // Se a câmera estiver ativa, reinicia com o novo facing
+    if (isCameraActive) {
+      cameraStream?.getTracks().forEach(track => track.stop());
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: newFacing }
+        });
+        setCameraStream(stream);
+      } catch (err: any) {
+        console.error("Camera switch failed", err);
       }
     }
   };
@@ -674,12 +695,27 @@ function AppInner() {
 
             {/* Controls - REPOSICIONADOS E COM Z-INDEX ALTO */}
             <div className="absolute bottom-10 left-1/2 -translate-x-1/2 flex items-center gap-6 z-50">
-              <button 
-                onClick={(e) => { e.stopPropagation(); toggleCamera(); }}
-                className={`w-16 h-16 rounded-full flex items-center justify-center transition-all shadow-2xl active:scale-90 ${isCameraActive ? 'bg-orange-500 scale-110' : 'glass hover:bg-white/20'}`}
-              >
-                {isCameraActive ? <CameraOff className="w-6 h-6" /> : <Camera className="w-6 h-6" />}
-              </button>
+              <div className="flex items-center gap-2">
+                <button 
+                  onClick={(e) => { e.stopPropagation(); toggleCamera(); }}
+                  className={`w-16 h-16 rounded-full flex items-center justify-center transition-all shadow-2xl active:scale-90 ${isCameraActive ? 'bg-orange-500 scale-110' : 'glass hover:bg-white/20'}`}
+                >
+                  {isCameraActive ? <CameraOff className="w-6 h-6" /> : <Camera className="w-6 h-6" />}
+                </button>
+                {isCameraActive && (
+                  <button 
+                    onClick={(e) => { e.stopPropagation(); switchCamera(); }}
+                    className="w-10 h-10 rounded-full glass flex items-center justify-center transition-all hover:bg-white/20 active:scale-90 shadow-lg"
+                    title={cameraFacing === 'environment' ? 'Virar para frontal' : 'Virar para traseira'}
+                  >
+                    <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M2 16V8a2 2 0 0 1 2-2h3l2-3h6l2 3h3a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2z"/>
+                      <circle cx="12" cy="12" r="3"/>
+                      <path d="M17 12h.01M7 12h.01" strokeLinecap="round"/>
+                    </svg>
+                  </button>
+                )}
+              </div>
               <button 
                 onClick={(e) => { e.stopPropagation(); toggleLive(); }}
                 className={`w-20 h-20 rounded-full flex items-center justify-center transition-all shadow-2xl active:scale-90 ${isLiveMode ? 'bg-red-500 scale-110 animate-pulse' : 'bg-orange-500 hover:bg-orange-600'}`}
