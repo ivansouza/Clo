@@ -71,6 +71,7 @@ function AppInner() {
   const [errorVisible, setErrorVisible] = useState<string | null>(null);
   const [isTTSEnabled, setIsTTSEnabled] = useState(true);
   const [voiceName, setVoiceName] = useState('Zephyr');
+  const [theme, setTheme] = useState<'laranja' | 'pink'>('laranja');
   const [systemPrompt, setSystemPrompt] = useState("Você é Clô, um assistente de IA premium rodando em tempo real. Importante: Fale de forma rápida, natural e dinâmica. Evite pausas longas. Seja extremamente conciso nas respostas e mantenha um tom sofisticado, mas enérgico, em Português do Brasil.");
   const [isLiveMode, setIsLiveMode] = useState(false);
   const [cameraStream, setCameraStream] = useState<MediaStream | null>(null);
@@ -441,7 +442,7 @@ function AppInner() {
   };
 
   return (
-    <div className="relative h-screen w-screen flex flex-col items-center justify-center p-6 md:p-12 overflow-hidden">
+    <div className={`relative h-screen w-screen flex flex-col items-center justify-center p-6 md:p-12 overflow-hidden theme-${theme}`}>
       <div className="atmosphere" />
 
       {/* Settings Modal */}
@@ -469,7 +470,7 @@ function AppInner() {
               </button>
               
               <h2 className="text-2xl font-medium mb-8 flex items-center gap-2">
-                <Settings className="text-orange-400" />
+                <Settings style={{ color: 'var(--tct)' }} />
                 Configurações
               </h2>
               
@@ -481,7 +482,8 @@ function AppInner() {
                   </div>
                   <button 
                     onClick={() => setIsTTSEnabled(!isTTSEnabled)}
-                    className={`w-12 h-6 rounded-full transition-colors relative ${isTTSEnabled ? 'bg-orange-500' : 'bg-white/10'}`}
+                    className={`w-12 h-6 rounded-full transition-colors relative ${isTTSEnabled ? '' : 'bg-white/10'}`}
+                    style={isTTSEnabled ? { backgroundColor: 'var(--tc)' } : {}}
                   >
                     <div className={`absolute top-1 bottom-1 w-4 rounded-full bg-white transition-all ${isTTSEnabled ? 'right-1' : 'left-1'}`} />
                   </button>
@@ -494,7 +496,8 @@ function AppInner() {
                       <button
                         key={voice.id}
                         onClick={() => setVoiceName(voice.id)}
-                        className={`p-3 rounded-xl flex items-center justify-between transition-all ${voiceName === voice.id ? 'bg-orange-500 text-white' : 'glass hover:bg-white/10'}`}
+                        className={`p-3 rounded-xl flex items-center justify-between transition-all ${voiceName === voice.id ? 'text-white' : 'glass hover:bg-white/10'}`}
+                        style={voiceName === voice.id ? { backgroundColor: 'var(--tc)' } : {}}
                       >
                         <span className="text-sm">{voice.name}</span>
                         {voiceName === voice.id && <Sparkles size={16} />}
@@ -517,7 +520,8 @@ function AppInner() {
                       href="https://aistudio.google.com/app/apikey" 
                       target="_blank" 
                       rel="noopener noreferrer"
-                      className="text-[10px] text-orange-400 hover:underline flex items-center gap-1"
+                      className="text-[10px] hover:underline flex items-center gap-1"
+                      style={{ color: 'var(--tct)' }}
                     >
                       Obtenha sua chave gratuita no Google AI Studio
                       <ChevronRight size={10} />
@@ -556,7 +560,7 @@ function AppInner() {
                 <Sparkles className="w-5 h-5 text-orange-400" />
               </div>
               <div className="flex flex-col">
-                <h1 className="text-2xl font-medium tracking-tight">Clô <span className="text-orange-400/80">ao vivo</span></h1>
+                <h1 className="text-2xl font-medium tracking-tight">Clô <span style={{ color: 'var(--tct)', opacity: 0.8 }}>ao vivo</span></h1>
                 <p className="text-[10px] uppercase tracking-[0.2em] text-white/40 font-mono">seu amigo de todas as horas!</p>
               </div>
             </motion.div>
@@ -583,7 +587,8 @@ function AppInner() {
               </button>
               <button 
                 onClick={() => setShowHistory(!showHistory)}
-                className={`p-2 glass rounded-lg transition-colors ${showHistory ? 'bg-orange-500 text-white' : 'hover:bg-white/20'}`}
+                className={`p-2 glass rounded-lg transition-colors ${showHistory ? 'text-white' : 'hover:bg-white/20'}`}
+                style={showHistory ? { backgroundColor: 'var(--tc)' } : {}}
               >
                 <History className="w-5 h-5" />
               </button>
@@ -596,13 +601,14 @@ function AppInner() {
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.9 }}
-                className="absolute top-20 left-12 right-12 z-50 p-4 glass rounded-2xl border-orange-500/50 flex items-center gap-4 text-orange-200"
+                className="absolute top-20 left-12 right-12 z-50 p-4 glass rounded-2xl flex items-center gap-4"
+                style={{ borderColor: 'var(--tc)', color: 'var(--tct)' }}
               >
-                <div className="w-10 h-10 rounded-full bg-orange-500/20 flex items-center justify-center shrink-0">
-                  <Settings className="w-5 h-5 text-orange-500" />
+                <div className="w-10 h-10 rounded-full flex items-center justify-center shrink-0" style={{ backgroundColor: 'var(--tcb)' }}>
+                  <Settings style={{ color: 'var(--tc)' }} />
                 </div>
                 <div className="flex-1">
-                  <h3 className="text-sm font-bold uppercase tracking-widest text-orange-500">Configuração Requerida</h3>
+                  <h3 className="text-sm font-bold uppercase tracking-widest" style={{ color: 'var(--tc)' }}>Configuração Requerida</h3>
                   <p className="text-sm opacity-80">{errorVisible}</p>
                 </div>
                 <button 
@@ -618,7 +624,7 @@ function AppInner() {
           {/* Clô Orb Section */}
           <div className="flex-1 glass-card p-12 flex flex-col items-center justify-center relative overflow-hidden group">
             {/* Ambient Glow */}
-            <div className="absolute inset-0 bg-gradient-to-tr from-orange-500/5 to-purple-500/5 pointer-events-none" />
+            <div className="absolute inset-0 pointer-events-none" style={{ background: 'linear-gradient(to top right, var(--tcb), rgba(168, 85, 247, 0.05))' }} />
             
             <motion.div
               animate={{
@@ -637,14 +643,15 @@ function AppInner() {
               }}
               className="relative w-48 h-48 md:w-64 md:h-64 rounded-full"
             >
-              <div className="absolute inset-0 rounded-full bg-gradient-to-br from-orange-400 to-red-600 blur-2xl opacity-20" />
-              <div className={`absolute inset-2 rounded-full border transition-colors duration-500 ${isListening ? 'border-orange-400/60' : 'border-white/20'} animate-pulse`} />
+              <div className="absolute inset-0 rounded-full blur-2xl opacity-20" style={{ background: 'linear-gradient(to bottom right, var(--tc), var(--tcd))' }} />
+              <div className={`absolute inset-2 rounded-full border transition-colors duration-500 animate-pulse`} style={{ borderColor: isListening ? 'var(--tcl)' : 'rgba(255,255,255,0.2)' }} />
               <div className="absolute inset-4 rounded-full glass border-white/40 shadow-inner overflow-hidden">
                 {/* Internal energy effect */}
                 <motion.div 
                   animate={{ y: isStreaming ? [0, -10, 0] : 0 }}
                   transition={{ duration: 0.5, repeat: Infinity }}
-                  className="absolute inset-0 bg-gradient-to-t from-orange-500/10 to-transparent"
+                  className="absolute inset-0 to-transparent"
+                  style={{ background: 'linear-gradient(to top, var(--tcb), transparent)' }}
                 />
               </div>
               
@@ -657,7 +664,7 @@ function AppInner() {
                     transition={{ duration: 2, repeat: Infinity }}
                     className="absolute inset-0 flex items-center justify-center pointer-events-none"
                   >
-                    <div className="w-full h-full rounded-full border border-orange-400/30" />
+                    <div className="w-full h-full rounded-full" style={{ border: '1px solid var(--tcl)', opacity: 0.3 }} />
                   </motion.div>
                 )}
               </AnimatePresence>
@@ -698,7 +705,8 @@ function AppInner() {
               <div className="flex items-center gap-2">
                 <button 
                   onClick={(e) => { e.stopPropagation(); toggleCamera(); }}
-                  className={`w-16 h-16 rounded-full flex items-center justify-center transition-all shadow-2xl active:scale-90 ${isCameraActive ? 'bg-orange-500 scale-110' : 'glass hover:bg-white/20'}`}
+                  className={`w-16 h-16 rounded-full flex items-center justify-center transition-all shadow-2xl active:scale-90 ${isCameraActive ? 'scale-110' : 'glass hover:bg-white/20'}`}
+                  style={isCameraActive ? { backgroundColor: 'var(--tc)' } : {}}
                 >
                   {isCameraActive ? <CameraOff className="w-6 h-6" /> : <Camera className="w-6 h-6" />}
                 </button>
@@ -718,7 +726,8 @@ function AppInner() {
               </div>
               <button 
                 onClick={(e) => { e.stopPropagation(); toggleLive(); }}
-                className={`w-20 h-20 rounded-full flex items-center justify-center transition-all shadow-2xl active:scale-90 ${isLiveMode ? 'bg-red-500 scale-110 animate-pulse' : 'bg-orange-500 hover:bg-orange-600'}`}
+                className={`w-20 h-20 rounded-full flex items-center justify-center transition-all shadow-2xl active:scale-90 ${isLiveMode ? 'bg-red-500 scale-110 animate-pulse' : ''}`}
+                style={!isLiveMode ? { backgroundColor: 'var(--tc)' } : {}}
               >
                 {isLiveMode ? <MicOff className="w-8 h-8" /> : <Mic className="w-8 h-8" />}
               </button>
@@ -733,133 +742,18 @@ function AppInner() {
           </div>
         </div>
 
-        {/* Right Side: Chat & History */}
-        <div className="w-full md:w-96 flex flex-col gap-4">
-          <div className="flex-1 glass-card flex flex-col relative overflow-hidden">
-            <AnimatePresence mode="wait">
-              {!showHistory ? (
-                <motion.div 
-                  key="chat"
-                  initial={{ opacity: 0, x: 20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: -20 }}
-                  className="flex-1 flex flex-col pt-4"
-                >
-                  <div className="px-4 pb-4 border-bottom border-white/10 flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
-                      <span className="text-xs font-mono uppercase tracking-widest text-white/40">Neural Link Active</span>
-                    </div>
-                  </div>
-
-                  <div 
-                    ref={scrollRef}
-                    className="flex-1 overflow-y-auto p-6 space-y-6 scrollbar-hide"
-                  >
-                    {messages.length === 0 && (
-                      <div className="h-full flex flex-col items-center justify-center text-center opacity-40">
-                        <Maximize2 className="w-12 h-12 mb-4" />
-                        <p className="text-sm">A conversa aparecerá aqui.<br/>Comece agora.</p>
-                      </div>
-                    )}
-                    {messages.map((msg, idx) => (
-                      <motion.div
-                        key={idx}
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className={`flex flex-col ${msg.role === 'user' ? 'items-end' : 'items-start'}`}
-                      >
-                        <div className={`max-w-[90%] p-4 rounded-2xl text-sm leading-relaxed ${msg.role === 'user' ? 'bg-white/10 rounded-tr-none' : 'glass rounded-tl-none border-white/5'}`}>
-                          {msg.content}
-                        </div>
-                      </motion.div>
-                    ))}
-                  </div>
-
-                  <div className="p-6 pt-0">
-                    <div className="relative group">
-                      <input 
-                        type="text"
-                        value={input}
-                        onChange={(e) => setInput(e.target.value)}
-                        onKeyPress={(e) => e.key === 'Enter' && handleSend()}
-                        placeholder="Comandar Clô..."
-                        className="w-full glass bg-white/5 rounded-2xl py-4 pl-6 pr-14 focus:outline-none focus:ring-2 focus:ring-orange-500/40 transition-all font-light"
-                      />
-                      <button 
-                        onClick={() => handleSend()}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-xl bg-orange-500 text-white flex items-center justify-center hover:scale-105 transition-transform disabled:opacity-50"
-                        disabled={isStreaming}
-                      >
-                        <ChevronRight size={20} />
-                      </button>
-                    </div>
-                  </div>
-                </motion.div>
-              ) : (
-                <motion.div 
-                  key="history"
-                  initial={{ opacity: 0, x: 20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: -20 }}
-                  className="flex-1 flex flex-col pt-4"
-                >
-                  <div className="px-4 pb-4 border-bottom border-white/10 flex items-center justify-between">
-                    <span className="text-xs font-mono uppercase tracking-widest text-white/40">Temporal Archive</span>
-                    <button 
-                      onClick={() => {
-                        setMessages([]);
-                        setShowHistory(false);
-                      }}
-                      className="text-[10px] text-red-400 hover:text-red-300 transition-colors uppercase font-bold"
-                    >
-                      Limpar Chat
-                    </button>
-                  </div>
-                  
-                  <div className="flex-1 p-6 space-y-4">
-                    <div className="p-4 rounded-xl glass border-orange-500/30 bg-orange-500/5 cursor-pointer">
-                      <div className="flex justify-between items-start mb-2">
-                        <span className="text-[10px] font-bold text-orange-400 uppercase tracking-tighter">Sessão Atual</span>
-                        <span className="text-[10px] text-white/20">Agora</span>
-                      </div>
-                      <p className="text-xs text-white/60 line-clamp-2 italic">
-                        {messages.length > 0 ? messages[messages.length-1].content : "Inicie uma conversa para gerar registros."}
-                      </p>
-                    </div>
-                    
-                    <div className="p-4 rounded-xl glass border-white/5 opacity-40 grayscale flex flex-col gap-2">
-                      <div className="flex justify-between items-start">
-                        <span className="text-[10px] font-bold text-white/40 uppercase tracking-tighter">Sessão #402</span>
-                        <span className="text-[10px] text-white/10">Ontem</span>
-                      </div>
-                      <div className="h-2 w-2/3 bg-white/10 rounded" />
-                      <div className="h-2 w-1/2 bg-white/10 rounded" />
-                    </div>
-
-                    <div className="flex flex-col items-center justify-center pt-12 opacity-20">
-                      <History className="w-12 h-12 mb-2" />
-                      <p className="text-[10px] uppercase tracking-widest text-center">Nenhum registro anterior encontrado no cache local</p>
-                    </div>
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
-          
-          <div className="glass-card p-4 flex items-center justify-between group cursor-pointer hover:bg-white/10 transition-colors">
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-lg bg-orange-400/20 flex items-center justify-center">
-                <Sparkles size={16} className="text-orange-400" />
-              </div>
-              <span className="text-xs uppercase tracking-widest font-bold text-white/60">Upgrade System</span>
-            </div>
-            <div className="w-6 h-6 rounded-md glass flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-              <ChevronRight size={14} />
-            </div>
-          </div>
-        </div>
+        {/* Painel direito removido — apenas modo áudio/Live */}
       </div>
+
+      {/* Theme Toggle */}
+      <button
+        onClick={() => setTheme(theme === 'laranja' ? 'pink' : 'laranja')}
+        className="fixed bottom-6 right-6 z-50 w-12 h-12 rounded-full glass flex items-center justify-center hover:bg-white/20 transition-all active:scale-90 shadow-lg"
+        style={{ border: '2px solid var(--tcl)', color: 'var(--tct)' }}
+        title={theme === 'pink' ? 'Tema Pink' : 'Tema Laranja'}
+      >
+        <span className="text-lg">{theme === 'pink' ? '💖' : '🔥'}</span>
+      </button>
 
       {/* Decorative Text */}
       <div className="fixed bottom-6 left-12 hidden md:block">

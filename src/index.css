@@ -39,4 +39,19 @@
     border-radius: 1.5rem;
     box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
   }
+
+  .theme-laranja {
+    --tc: #f97316;
+    --tcl: #fb923c;
+    --tcd: #ea580c;
+    --tcb: rgba(249, 115, 22, 0.2);
+    --tct: #fb923c;
+  }
+  .theme-pink {
+    --tc: #ec4899;
+    --tcl: #f9a8d4;
+    --tcd: #be185d;
+    --tcb: rgba(236, 72, 153, 0.2);
+    --tct: #f9a8d4;
+  }
 }
