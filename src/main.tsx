@@ -2,9 +2,8 @@ import {StrictMode} from 'react';
 import {createRoot} from 'react-dom/client';
 import App from './App.tsx';
 import './index.css';
-import { registerSW } from 'virtual:pwa-register';
-
-registerSW({ immediate: true });
+// PWA registration removed - was causing white screen on some devices
+// PWA will be handled by the service worker automatically
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
