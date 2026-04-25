@@ -21,20 +21,16 @@ export default defineConfig(({mode}) => {
           theme_color: '#f97316',
           icons: [
             {
-              src: 'pwa-192x192.png',
-              sizes: '192x192',
-              type: 'image/png'
-            },
-            {
-              src: 'pwa-512x512.png',
-              sizes: '512x512',
-              type: 'image/png'
-            },
-            {
-              src: 'pwa-512x512.png',
+              src: 'https://cdn-icons-png.flaticon.com/512/1698/1698535.png',
               sizes: '512x512',
               type: 'image/png',
-              purpose: 'any maskable'
+              purpose: 'any'
+            },
+            {
+              src: 'https://cdn-icons-png.flaticon.com/512/1698/1698535.png',
+              sizes: '512x512',
+              type: 'image/png',
+              purpose: 'maskable'
             }
           ]
         }
