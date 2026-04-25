@@ -46,9 +46,10 @@ export default function App() {
   const [userApiKey, setUserApiKey] = useState(localStorage.getItem('CLO_API_KEY') || '');
   
   useEffect(() => {
+    const apiKey = typeof process !== 'undefined' ? process.env.GEMINI_API_KEY : '';
     if (userApiKey) {
       setApiKey(userApiKey);
-    } else if (!process.env.GEMINI_API_KEY || process.env.GEMINI_API_KEY === 'undefined') {
+    } else if (!apiKey || apiKey === 'undefined') {
       setShowSettings(true);
       setErrorVisible("Por favor, configure sua API Key nas configurações para usar o Clô fora do ambiente de desenvolvimento.");
     }
