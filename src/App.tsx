@@ -228,11 +228,11 @@ function AppInner() {
   };
   
   const voices = [
-    { id: 'Zephyr', name: 'Zephyr (Feminina - Suave)', gender: 'female' },
-    { id: 'Kore', name: 'Kore (Feminina - Clara)', gender: 'female' },
-    { id: 'Puck', name: 'Puck (Masculina - Enérgica)', gender: 'male' },
-    { id: 'Aoede', name: 'Aoede (Feminina - Expressiva)', gender: 'female' },
-    { id: 'Charon', name: 'Charon (Masculina - Profunda)', gender: 'male' },
+    { id: 'Zephyr', name: 'Variação 1' },
+    { id: 'Kore', name: 'Variação 2' },
+    { id: 'Puck', name: 'Variação 3' },
+    { id: 'Aoede', name: 'Variação 4' },
+    { id: 'Charon', name: 'Variação 5' },
   ];
 
   // Função para falar o texto usando Gemini TTS
