@@ -662,7 +662,7 @@ function AppInner() {
 
             <div className="absolute top-12 left-0 right-0 text-center z-10 pointer-events-none px-6">
               <h2 className="text-sm text-white/40 font-serif italic tracking-wider drop-shadow-lg">
-                {isStreaming ? "Sintonizando rede neural..." : isListening ? "Ouvindo sua frequência..." : "Inicie o Clô ao vivo para começar"}
+                {isStreaming ? "Sintonizando rede neural..." : isListening ? "Ouvindo sua frequência..." : isCameraActive ? "" : "Inicie o Clô ao vivo para começar"}
               </h2>
             </div>
             
