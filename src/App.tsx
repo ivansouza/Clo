@@ -546,7 +546,7 @@ function AppInner() {
       </AnimatePresence>
 
       {/* Main Container */}
-      <div className="z-10 w-full max-w-lg h-full flex flex-col gap-4 mx-auto overflow-hidden">
+      <div className="z-10 w-full max-w-lg h-full flex flex-col gap-4 mx-auto overflow-hidden" style={{ maxHeight: '100dvh' }}>
         
         {/* Left Side: Interaction Zone */}
         <div className="flex-1 flex flex-col gap-6 relative">
@@ -666,14 +666,14 @@ function AppInner() {
               </h2>
             </div>
             
-            {/* Camera Overlay */}
+            {/* Camera Overlay - topo do container, altura variável */}
             <AnimatePresence>
               {isCameraActive && (
                 <motion.div 
-                  initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                  initial={{ opacity: 0, scale: 0.9, y: -20 }}
                   animate={{ opacity: 1, scale: 1, y: 0 }}
-                  exit={{ opacity: 0, scale: 0.9, y: 20 }}
-                  className="absolute bottom-6 left-6 right-6 h-48 md:h-64 rounded-2xl overflow-hidden glass border-white/20 shadow-2xl"
+                  exit={{ opacity: 0, scale: 0.9, y: -20 }}
+                  className="absolute top-0 left-0 right-0 bottom-32 rounded-2xl overflow-hidden glass border-white/20 shadow-2xl"
                 >
                   <video 
                     ref={videoRef} 
