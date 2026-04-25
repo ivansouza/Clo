@@ -1,0 +1,6 @@
+{
+  "name": "Clô AI",
+  "description": "Seu amigo de todas as horas! Um assistente de IA multimodal sofisticado com visão e voz em tempo real.",
+  "requestFramePermissions": ["camera", "microphone"],
+  "majorCapabilities": ["Real-time Multimodal Interaction", "Vision-Driven AI", "Adaptive UI"]
+}
