@@ -7,7 +7,7 @@ import { VitePWA } from 'vite-plugin-pwa';
 export default defineConfig(({mode}) => {
   const env = loadEnv(mode, '.', '');
   return {
-    base: './',
+    base: '/Clo/',
     plugins: [
       react(), 
       tailwindcss(),
@@ -25,12 +25,6 @@ export default defineConfig(({mode}) => {
               sizes: '512x512',
               type: 'image/png',
               purpose: 'any'
-            },
-            {
-              src: 'https://cdn-icons-png.flaticon.com/512/1698/1698535.png',
-              sizes: '512x512',
-              type: 'image/png',
-              purpose: 'maskable'
             }
           ]
         }
