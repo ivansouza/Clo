@@ -22,7 +22,7 @@ export function getAI() {
 export async function chatStream(message: string, systemInstruction?: string) {
   const ai = getAI();
   const response = await ai.models.generateContentStream({
-    model: "gemini-3.1-flash-preview",
+    model: "gemini-2.5-flash",
     contents: [{ role: "user", parts: [{ text: message }] }],
     config: {
       systemInstruction,
@@ -34,7 +34,7 @@ export async function chatStream(message: string, systemInstruction?: string) {
 export async function connectLive(callbacks: any, voiceName: string = 'Zephyr', systemInstruction: string = "Você é Zenith, um assistente de IA em tempo real. Responda de forma concisa, amigável e filosófica em Português do Brasil.") {
   const ai = getAI();
   return ai.live.connect({
-    model: "gemini-3.1-flash-live-preview",
+    model: "gemini-2.5-flash-live-preview",
     callbacks,
     config: {
       responseModalities: [Modality.AUDIO],
@@ -70,7 +70,7 @@ export async function generateTTSSpeech(text: string, voiceName: string = 'Kore'
 export async function analyzeImage(imageBuffer: string, prompt: string) {
   const ai = getAI();
   const response = await ai.models.generateContent({
-    model: "gemini-3.1-flash-preview",
+    model: "gemini-2.5-flash",
     contents: [
       {
         role: "user",
