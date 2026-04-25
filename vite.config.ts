@@ -8,6 +8,10 @@ export default defineConfig(({mode}) => {
   const env = loadEnv(mode, '.', '');
   return {
     base: '/Clo/',
+    define: {
+      'process.env.GEMINI_API_KEY': JSON.stringify(env.GEMINI_API_KEY || ''),
+      'process.env.NODE_ENV': JSON.stringify(mode),
+    },
     plugins: [
       react(), 
       tailwindcss(),
@@ -22,6 +26,12 @@ export default defineConfig(({mode}) => {
           icons: [
             {
               src: 'https://cdn-icons-png.flaticon.com/512/1698/1698535.png',
+              sizes: '192x192',
+              type: 'image/png',
+              purpose: 'any'
+            },
+            {
+              src: 'https://cdn-icons-png.flaticon.com/512/1698/1698535.png',
               sizes: '512x512',
               type: 'image/png',
               purpose: 'any'
@@ -30,9 +40,6 @@ export default defineConfig(({mode}) => {
         }
       })
     ],
-    define: {
-      'process.env.GEMINI_API_KEY': JSON.stringify(env.GEMINI_API_KEY),
-    },
     resolve: {
       alias: {
         '@': path.resolve(__dirname, '.'),
