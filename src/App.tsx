@@ -442,7 +442,7 @@ function AppInner() {
   };
 
   return (
-    <div className={`relative h-screen w-screen flex flex-col items-center justify-center p-6 md:p-12 overflow-hidden theme-${theme}`}>
+    <div className={`relative h-screen w-screen flex flex-col items-center justify-center p-4 md:p-8 overflow-hidden theme-${theme}`}>
       <div className="atmosphere" />
 
       {/* Settings Modal */}
@@ -546,7 +546,7 @@ function AppInner() {
       </AnimatePresence>
 
       {/* Main Container */}
-      <div className="z-10 w-full max-w-6xl h-full flex flex-col md:flex-row gap-8">
+      <div className="z-10 w-full max-w-lg h-full flex flex-col gap-4 mx-auto overflow-hidden">
         
         {/* Left Side: Interaction Zone */}
         <div className="flex-1 flex flex-col gap-6 relative">
@@ -556,9 +556,6 @@ function AppInner() {
               animate={{ opacity: 1, x: 0 }}
               className="flex items-center gap-3"
             >
-              <div className="w-10 h-10 rounded-xl glass flex items-center justify-center">
-                <Sparkles className="w-5 h-5 text-orange-400" />
-              </div>
               <div className="flex flex-col">
                 <h1 className="text-2xl font-medium tracking-tight">Clô <span style={{ color: 'var(--tct)', opacity: 0.8 }}>ao vivo</span></h1>
                 <p className="text-[10px] uppercase tracking-[0.2em] text-white/40 font-mono">seu amigo de todas as horas!</p>
@@ -584,13 +581,6 @@ function AppInner() {
                 className="p-2 glass rounded-lg hover:bg-white/20 transition-colors"
               >
                 <Settings className="w-5 h-5" />
-              </button>
-              <button 
-                onClick={() => setShowHistory(!showHistory)}
-                className={`p-2 glass rounded-lg transition-colors ${showHistory ? 'text-white' : 'hover:bg-white/20'}`}
-                style={showHistory ? { backgroundColor: 'var(--tc)' } : {}}
-              >
-                <History className="w-5 h-5" />
               </button>
             </div>
           </div>
@@ -641,7 +631,7 @@ function AppInner() {
                 repeat: Infinity,
                 ease: "easeInOut"
               }}
-              className="relative w-48 h-48 md:w-64 md:h-64 rounded-full"
+              className="relative w-40 h-40 md:w-56 md:h-56 rounded-full"
             >
               <div className="absolute inset-0 rounded-full blur-2xl opacity-20" style={{ background: 'linear-gradient(to bottom right, var(--tc), var(--tcd))' }} />
               <div className={`absolute inset-2 rounded-full border transition-colors duration-500 animate-pulse`} style={{ borderColor: isListening ? 'var(--tcl)' : 'rgba(255,255,255,0.2)' }} />
@@ -705,7 +695,7 @@ function AppInner() {
               <div className="flex items-center gap-2">
                 <button 
                   onClick={(e) => { e.stopPropagation(); toggleCamera(); }}
-                  className={`w-16 h-16 rounded-full flex items-center justify-center transition-all shadow-2xl active:scale-90 ${isCameraActive ? 'scale-110' : 'glass hover:bg-white/20'}`}
+                  className={`w-14 h-14 rounded-full flex items-center justify-center transition-all shadow-2xl active:scale-90 ${isCameraActive ? 'scale-110' : 'glass hover:bg-white/20'}`}
                   style={isCameraActive ? { backgroundColor: 'var(--tc)' } : {}}
                 >
                   {isCameraActive ? <CameraOff className="w-6 h-6" /> : <Camera className="w-6 h-6" />}
@@ -726,23 +716,14 @@ function AppInner() {
               </div>
               <button 
                 onClick={(e) => { e.stopPropagation(); toggleLive(); }}
-                className={`w-20 h-20 rounded-full flex items-center justify-center transition-all shadow-2xl active:scale-90 ${isLiveMode ? 'bg-red-500 scale-110 animate-pulse' : ''}`}
+                className={`w-16 h-16 rounded-full flex items-center justify-center transition-all shadow-2xl active:scale-90 ${isLiveMode ? 'bg-red-500 scale-110 animate-pulse' : ''}`}
                 style={!isLiveMode ? { backgroundColor: 'var(--tc)' } : {}}
               >
                 {isLiveMode ? <MicOff className="w-8 h-8" /> : <Mic className="w-8 h-8" />}
               </button>
-              <button 
-                onClick={(e) => { e.stopPropagation(); toggleListening(); }}
-                className={`w-16 h-16 rounded-full flex items-center justify-center transition-all shadow-2xl active:scale-90 ${isListening ? 'bg-blue-500 scale-110 animate-pulse' : 'glass hover:bg-white/20'}`}
-                title="Ditar texto (STT)"
-              >
-                {isListening ? <X className="w-6 h-6" /> : <Languages className="w-6 h-6" />}
-              </button>
             </div>
           </div>
         </div>
-
-        {/* Painel direito removido — apenas modo áudio/Live */}
       </div>
 
       {/* Theme Toggle */}
