@@ -21,7 +21,7 @@ export default defineConfig(({mode}) => {
       tailwindcss(),
       VitePWA({
         registerType: 'autoUpdate',
-        injectRegister: false, // Don't inject register script - prevents white screen
+        injectRegister: 'script', // Inject PWA register script for install prompt
         includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'mask-icon.svg'],
         manifest: {
           name: 'Clô AI',
