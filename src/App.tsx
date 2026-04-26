@@ -76,14 +76,67 @@ function AppInner() {
   const [isLiveMode, setIsLiveMode] = useState(false);
   const [cameraStream, setCameraStream] = useState<MediaStream | null>(null);
   const [userApiKey, setUserApiKey] = useState(localStorage.getItem('CLO_API_KEY') || '');
+  const [keyValid, setKeyValid] = useState<boolean | null>(null); // null = não testada, true = válida, false = inválida
+  const [keyChecking, setKeyChecking] = useState(false);
+  const deferredPromptRef = useRef<any>(null);
   
+  // Capturar evento de instalação PWA
+  useEffect(() => {
+    const handler = (e: Event) => {
+      e.preventDefault();
+      deferredPromptRef.current = e;
+    };
+    window.addEventListener('beforeinstallprompt', handler);
+    return () => window.removeEventListener('beforeinstallprompt', handler);
+  }, []);
+
+  // Forçar instalação PWA
+  const forceInstall = async () => {
+    const prompt = deferredPromptRef.current;
+    if (prompt) {
+      prompt.prompt();
+      const result = await prompt.userChoice;
+      if (result.outcome === 'accepted') {
+        deferredPromptRef.current = null;
+      }
+    }
+  };
+
+  // Validar API key testando o modelo
+  const validateApiKey = async (key: string): Promise<boolean> => {
+    try {
+      const resp = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models?key=${key}`,
+        { method: 'GET' }
+      );
+      const data = await resp.json();
+      return resp.ok && data.models && data.models.length > 0;
+    } catch {
+      return false;
+    }
+  };
+
   useEffect(() => {
     const apiKey = typeof process !== 'undefined' ? process.env.GEMINI_API_KEY : '';
     if (userApiKey) {
       setApiKey(userApiKey);
+      // Testar a key
+      setKeyChecking(true);
+      validateApiKey(userApiKey).then(valid => {
+        setKeyValid(valid);
+        setKeyChecking(false);
+        if (valid) {
+          setErrorVisible(null);
+          setShowSettings(false);
+          setTimeout(() => forceInstall(), 1000);
+        } else {
+          setErrorVisible("API Key inválida. Verifique se a chave está correta e tem acesso aos modelos Gemini.");
+          setShowSettings(true);
+        }
+      });
     } else if (!apiKey || apiKey === 'undefined') {
       setShowSettings(true);
-      setErrorVisible("Por favor, configure sua API Key nas configurações para usar o Clô fora do ambiente de desenvolvimento.");
+      setErrorVisible("Por favor, configure sua API Key nas configurações para usar o Clô.");
     }
   }, [userApiKey]);
 
@@ -91,6 +144,8 @@ function AppInner() {
     setUserApiKey(key);
     localStorage.setItem('CLO_API_KEY', key);
     setApiKey(key);
+    setKeyValid(null);
+    setKeyChecking(true);
   };
   
   const audioContextRef = useRef<AudioContext | null>(null);
@@ -514,18 +569,32 @@ function AppInner() {
                       value={userApiKey}
                       onChange={(e) => handleSaveApiKey(e.target.value)}
                       placeholder="Cole sua API Key aqui..."
-                      className="w-full glass bg-white/5 rounded-xl p-4 text-sm focus:outline-none focus:ring-1 focus:ring-orange-500/50"
+                      className="w-full glass bg-white/5 rounded-xl p-4 text-sm focus:outline-none focus:ring-1"
+                      style={{ '--tw-ring-color': 'var(--theme-ring)' } as React.CSSProperties}
                     />
-                    <a 
-                      href="https://aistudio.google.com/app/apikey" 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      className="text-[10px] hover:underline flex items-center gap-1"
-                      style={{ color: 'var(--tct)' }}
-                    >
-                      Obtenha sua chave gratuita no Google AI Studio
-                      <ChevronRight size={10} />
-                    </a>
+                    <div className="flex items-center gap-2 mt-2">
+                      {keyChecking && (
+                        <span className="text-xs text-white/50 animate-pulse">Verificando chave...</span>
+                      )}
+                      {!keyChecking && keyValid === true && (
+                        <span className="text-xs text-green-400">✅ Chave válida</span>
+                      )}
+                      {!keyChecking && keyValid === false && (
+                        <span className="text-xs text-red-400">❌ Chave inválida</span>
+                      )}
+                      {!keyChecking && keyValid === null && !userApiKey && (
+                        <a 
+                          href="https://aistudio.google.com/app/apikey" 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="text-[10px] hover:underline flex items-center gap-1"
+                          style={{ color: 'var(--tct)' }}
+                        >
+                          Obtenha sua chave gratuita no Google AI Studio
+                          <ChevronRight size={10} />
+                        </a>
+                      )}
+                    </div>
                   </div>
                 </div>
 
