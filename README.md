@@ -177,7 +177,7 @@ O deploy é **automático** via GitHub Actions. Toda vez que você faz push na `
 
 Este projeto está licenciado sob a **GNU General Public License v3.0** — veja o arquivo [LICENSE](LICENSE) para mais detalhes.
 
-Copyright © 2025 [Ivan Souza](https://github.com/ivansouza)
+Copyright © 2025-2026 [Ivan Souza](https://github.com/ivansouza)
 
 ---
 
