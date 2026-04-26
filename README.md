@@ -88,10 +88,10 @@ Troque o visual do app com um clique:
 
 | Função | Modelo |
 |--------|--------|
-| Live (áudio) | `gemini-3.1-flash-live-preview` |
-| TTS (voz) | `gemini-3.1-flash-tts-preview` |
-| Chat | `gemini-3.1-flash-preview` |
-| Imagem | `gemini-3.1-flash-preview` |
+| 🎤 Live (áudio em tempo real) | `gemini-3.1-flash-live-preview` |
+| 🗣️ TTS (voz do Clô) | `gemini-3.1-flash-tts-preview` |
+
+> Os modelos `gemini-3.1-flash-preview` (chat e imagem) estão presentes no código mas **não são mais utilizados** desde a remoção do chat textual.
 
 ---
 
