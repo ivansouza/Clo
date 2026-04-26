@@ -11,6 +11,9 @@
     <a href="#-funcionalidades">
       <img src="https://img.shields.io/badge/Funcionalidades-%E2%86%93-orange?style=for-the-badge" alt="Funcionalidades"/>
     </a>
+    <a href="LICENSE">
+      <img src="https://img.shields.io/badge/Licen%C3%A7a-GPLv3-blue?style=for-the-badge" alt="GPLv3"/>
+    </a>
   </p>
   <br/>
 </div>
@@ -167,6 +170,14 @@ O deploy é **automático** via GitHub Actions. Toda vez que você faz push na `
 - ✅ ErrorBoundary contra tela branca
 - ✅ Container responsivo (100dvh)
 - ✅ Backup em branch separada
+
+---
+
+## 📄 Licença
+
+Este projeto está licenciado sob a **GNU General Public License v3.0** — veja o arquivo [LICENSE](LICENSE) para mais detalhes.
+
+Copyright © 2025 [Ivan Souza](https://github.com/ivansouza)
 
 ---
 
