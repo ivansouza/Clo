@@ -40,8 +40,6 @@ jobs:
         run: npm install
       - name: Build
         run: npm run build
-      - name: Copy graphify output
-        run: cp -r graphify-out dist/graphify-out 2>/dev/null || echo "No graphify-out to copy"
       - name: Setup Pages
         uses: actions/configure-pages@v4
       - name: Upload artifact
