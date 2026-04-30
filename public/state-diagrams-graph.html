@@ -6,12 +6,12 @@
 <title>State Diagrams</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-html,body{width:100%;height:100%;background:#0a0a1a;color:#fff;font-family:sans-serif;overflow:hidden;touch-action:manipulation}
+html,body{width:100%;height:100%;background:#0a0a1a;color:#fff;font-family:sans-serif;overflow:hidden;touch-action:none}
 #h{padding:8px 12px;background:#0f0f2a;border-bottom:1px solid #1a1a3a;display:flex;align-items:center;gap:8px;flex-shrink:0}
 #h h1{font-size:14px;color:#3b82f6;white-space:nowrap}
 #h .b{color:#888;font-size:11px;white-space:nowrap}
-svg{width:100%;height:calc(100vh - 41px);background:#0a0a1a;display:block;touch-action:manipulation}
-.nd circle{stroke:rgba(255,255,255,.2);stroke-width:.5;cursor:pointer}
+svg{width:100%;height:calc(100vh - 41px);background:#0a0a1a;display:block;touch-action:none}
+.nd circle{stroke:rgba(255,255,255,.2);stroke-width:.5;cursor:grab}
 .nd text{font-size:8px;fill:#aaa;pointer-events:none;user-select:none}
 .lk{stroke:rgba(58,58,106,.2);stroke-width:.5}
 #tp{position:fixed;z-index:20;background:rgba(20,20,50,.95);border:1px solid #3a3a6a;border-radius:6px;padding:6px 10px;font-size:11px;display:none;pointer-events:none;max-width:220px}
@@ -31,10 +31,8 @@ var svg=document.getElementById('g');
 var W=svg.clientWidth||window.innerWidth;
 var H=svg.clientHeight||window.innerHeight;
 var ns={},ls=new Set();
-// Portrait layout: spread vertically, compact horizontally
 N.forEach(function(n,i){n.x=W/2+(Math.random()-0.5)*W*0.4;n.y=20+(i/N.length)*H*0.9+(Math.random()-0.5)*30;ns[n.id]=n;});
 E.forEach(function(e){ls.add(e.source);ls.add(e.target);});
-// Force layout optimized for portrait
 for(var t=0;t<200;t++){
   E.forEach(function(e){var s=ns[e.source],t=ns[e.target];if(s&&t){var dx=t.x-s.x,dy=t.y-s.y,d=Math.sqrt(dx*dx+dy*dy)||1;var f=(d-100)*0.008;s.x+=f*dx/d;s.y+=f*dy/d;t.x-=f*dx/d;t.y-=f*dy/d;}});
   N.forEach(function(n,i){N.forEach(function(m,j){if(i!==j){var dx=m.x-n.x,dy=m.y-n.y,d=Math.sqrt(dx*dx+dy*dy)||1;if(d<30){var f=(30-d)*0.04;n.x-=f*dx/d;n.y-=f*dy/d;m.x+=f*dx/d;m.y+=f*dy/d;}}})});
@@ -44,12 +42,33 @@ var ns2 = document.createElementNS('http://www.w3.org/2000/svg', 'g');
 E.forEach(function(e){var s=ns[e.source],t=ns[e.target];if(s&&t){var l=document.createElementNS('http://www.w3.org/2000/svg','line');l.setAttribute('class','lk');l.setAttribute('x1',s.x);l.setAttribute('y1',s.y);l.setAttribute('x2',t.x);l.setAttribute('y2',t.y);ns2.appendChild(l);}});
 N.forEach(function(n){var g=document.createElementNS('http://www.w3.org/2000/svg','g');g.setAttribute('class','nd');var tr=document.createElementNS('http://www.w3.org/2000/svg','circle');tr.setAttribute('r',ls.has(n.id)?7:3);tr.setAttribute('fill',ls.has(n.id)?(C[n.type]||'#666'):'#333');g.appendChild(tr);var tx=document.createElementNS('http://www.w3.org/2000/svg','text');tx.setAttribute('dx',10);tx.setAttribute('dy',3);tx.textContent=n.label||n.id;g.appendChild(tx);g.setAttribute('transform','translate('+n.x+','+n.y+')');ns2.appendChild(g);});
 svg.appendChild(ns2);
+
+// Drag support
+var dragNode=null,dragOffX=0,dragOffY=0;
+function getPos(e){return e.touches?{x:e.touches[0].clientX,y:e.touches[0].clientY}:{x:e.clientX,y:e.clientY};}
+svg.addEventListener('mousedown',function(e){var p=getPos(e);var rect=svg.getBoundingClientRect();var mx=p.x-rect.left,my=p.y-rect.top;N.forEach(function(n){var dx=mx-n.x,dy=my-n.y;if(dx*dx+dy*dy<400){dragNode=n;dragOffX=n.x-mx;dragOffY=n.y-my;n.fx=n.x;n.fy=n.y;}});});
+svg.addEventListener('mousemove',function(e){if(!dragNode)return;var p=getPos(e);var rect=svg.getBoundingClientRect();dragNode.x=p.x-rect.left+dragOffX;dragNode.y=p.y-rect.top+dragOffY;dragNode.fx=dragNode.x;dragNode.fy=dragNode.y;update();});
+svg.addEventListener('mouseup',function(){if(dragNode){dragNode.fx=null;dragNode.fy=null;dragNode=null;}});
+svg.addEventListener('mouseleave',function(){if(dragNode){dragNode.fx=null;dragNode.fy=null;dragNode=null;}});
+// Touch drag
+svg.addEventListener('touchstart',function(e){var p=getPos(e);var rect=svg.getBoundingClientRect();var mx=p.x-rect.left,my=p.y-rect.top;N.forEach(function(n){var dx=mx-n.x,dy=my-n.y;if(dx*dx+dy*dy<400){dragNode=n;dragOffX=n.x-mx;dragOffY=n.y-my;n.fx=n.x;n.fy=n.y;}});});
+svg.addEventListener('touchmove',function(e){e.preventDefault();if(!dragNode)return;var p=getPos(e);var rect=svg.getBoundingClientRect();dragNode.x=p.x-rect.left+dragOffX;dragNode.y=p.y-rect.top+dragOffY;dragNode.fx=dragNode.x;dragNode.fy=dragNode.y;update();});
+svg.addEventListener('touchend',function(){if(dragNode){dragNode.fx=null;dragNode.fy=null;dragNode=null;}});
+
+function update() {
+  var lines=svg.querySelectorAll('.lk');
+  var idx=0;
+  E.forEach(function(e){var s=ns[e.source],t=ns[e.target];if(s&&t&&lines[idx]){lines[idx].setAttribute('x1',s.x);lines[idx].setAttribute('y1',s.y);lines[idx].setAttribute('x2',t.x);lines[idx].setAttribute('y2',t.y);idx++;}});
+  var nodes=svg.querySelectorAll('.nd');
+  N.forEach(function(n,i){if(nodes[i])nodes[i].setAttribute('transform','translate('+n.x+','+n.y+')');});
+}
+
+// Tooltip
 var tp=document.getElementById('tp');
 svg.querySelectorAll('.nd').forEach(function(el,i){
   el.addEventListener('mouseover',function(e){var n=N[i];tp.style.display='block';tp.innerHTML='<div class=lb>'+(n.label||n.id)+'</div><div class=ty>'+(n.type||'')+'</div>';tp.style.left=Math.min(e.pageX+10,window.innerWidth-230)+'px';tp.style.top=Math.min(e.pageY-5,window.innerHeight-60)+'px';this.querySelector('circle').setAttribute('r',ls.has(n.id)?11:5);});
   el.addEventListener('mouseout',function(){tp.style.display='none';this.querySelector('circle').setAttribute('r',ls.has(N[i].id)?7:3);});
-  // Touch support
-  el.addEventListener('touchstart',function(e){e.preventDefault();var n=N[i];tp.style.display='block';tp.innerHTML='<div class=lb>'+(n.label||n.id)+'</div><div class=ty>'+(n.type||'')+'</div>';var t=e.touches[0];tp.style.left=Math.min(t.clientX+10,window.innerWidth-230)+'px';tp.style.top=Math.min(t.clientY-5,window.innerHeight-60)+'px';setTimeout(function(){tp.style.display='none'},2000);});
+  el.addEventListener('touchstart',function(e){e.stopPropagation();var n=N[i];tp.style.display='block';tp.innerHTML='<div class=lb>'+(n.label||n.id)+'</div><div class=ty>'+(n.type||'')+'</div>';var t=e.touches[0];tp.style.left=Math.min(t.clientX+10,window.innerWidth-230)+'px';tp.style.top=Math.min(t.clientY-5,window.innerHeight-60)+'px';setTimeout(function(){tp.style.display='none'},2000);});
 });
 </script>
 </body>
