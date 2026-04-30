@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>State Diagrams Graph</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:sans-serif;background:#0a0a1a;color:#fff;overflow:hidden}
+#h{padding:10px 16px;background:rgba(10,10,26,.9);border-bottom:1px solid #1a1a3a;position:fixed;top:0;left:0;right:0;z-index:10;display:flex;align-items:center;gap:12px}
+#h h1{font-size:16px;color:#3b82f6}
+#h span{color:#666;font-size:12px}
+#c{display:block;margin-top:44px}
+.tp{position:fixed;background:#1a1a3a;border:1px solid #3a3a6a;border-radius:8px;padding:8px 12px;font-size:13px;display:none;pointer-events:none;z-index:20}
+.tp .lb{color:#3b82f6;font-weight:bold}
+.tp .ty{color:#888;font-size:11px}
+</style>
+</head>
+<body>
+<div id=h><h1>📐 State Diagrams</h1><span>29 nodes · 26 edges</span></div>
+<canvas id=c></canvas>
+<div class=tp id=tp><div class=lb id=tpl></div><div class=ty id=tpt></div></div>
+<script>
+const N=[{"id": "StateMachine", "label": "State Machine", "type": "concept"}, {"id": "State", "label": "State", "type": "concept"}, {"id": "Event", "label": "Event", "type": "concept"}, {"id": "GuardCondition", "label": "Guard Condition", "type": "concept"}, {"id": "Transition", "label": "Transition", "type": "concept"}, {"id": "Activity", "label": "Activity", "type": "concept"}, {"id": "Action", "label": "Action", "type": "concept"}, {"id": "InitialState", "label": "Initial State", "type": "concept"}, {"id": "FinalState", "label": "Final State", "type": "concept"}, {"id": "CompositeState", "label": "Composite State", "type": "concept"}, {"id": "SuperState", "label": "Super-State", "type": "concept"}, {"id": "SubState", "label": "Sub-State", "type": "concept"}, {"id": "ConcurrentSubStates", "label": "Concurrent Sub-States", "type": "concept"}, {"id": "Regions", "label": "Regions", "type": "concept"}, {"id": "HistoryState", "label": "History State", "type": "concept"}, {"id": "ActivityDiagram", "label": "Activity Diagram", "type": "concept"}, {"id": "Class", "label": "Class", "type": "concept"}, {"id": "Toaster", "label": "Toaster", "type": "example"}, {"id": "Off", "label": "Off", "type": "example"}, {"id": "On", "label": "On", "type": "example"}, {"id": "Working", "label": "Working", "type": "example"}, {"id": "Idle", "label": "Idle", "type": "example"}, {"id": "Burned", "label": "Burned", "type": "example"}, {"id": "AIModelingTools", "label": "AI Modeling Tools", "type": "tool"}, {"id": "AIChatbot", "label": "AI Chatbot", "type": "tool"}, {"id": "StateNotation", "label": "State (rectangle with rounded corners)", "type": "notation"}, {"id": "TransitionNotation", "label": "Transition (solid directed line)", "type": "notation"}, {"id": "HistoryStateNotation", "label": "History State (circle with H inside)", "type": "notation"}, {"id": "ConcurrentRegionsNotation", "label": "Concurrent Regions (separated by dashed line)", "type": "notation"}];
+const E=[{"source": "StateMachine", "target": "State", "relation": "contains"}, {"source": "StateMachine", "target": "Event", "relation": "responds to"}, {"source": "StateMachine", "target": "Transition", "relation": "contains"}, {"source": "StateMachine", "target": "InitialState", "relation": "starts with"}, {"source": "StateMachine", "target": "FinalState", "relation": "ends with"}, {"source": "State", "target": "CompositeState", "relation": "can be"}, {"source": "CompositeState", "target": "SubState", "relation": "contains"}, {"source": "CompositeState", "target": "ConcurrentSubStates", "relation": "supports"}, {"source": "ConcurrentSubStates", "target": "Regions", "relation": "separated by"}, {"source": "CompositeState", "target": "HistoryState", "relation": "can have"}, {"source": "Transition", "target": "Event", "relation": "triggered by"}, {"source": "Transition", "target": "GuardCondition", "relation": "conditioned by"}, {"source": "Transition", "target": "State", "relation": "connects"}, {"source": "ActivityDiagram", "target": "StateMachine", "relation": "reducible to"}, {"source": "StateDiagram", "target": "Class", "relation": "associated with"}, {"source": "Toaster", "target": "Off", "relation": "has state"}, {"source": "Toaster", "target": "On", "relation": "has state"}, {"source": "Toaster", "target": "Working", "relation": "has state"}, {"source": "Toaster", "target": "Idle", "relation": "has state"}, {"source": "Toaster", "target": "Burned", "relation": "has state"}, {"source": "Working", "target": "measure temperature", "relation": "has sub-state"}, {"source": "Working", "target": "compare with upper limit", "relation": "has sub-state"}, {"source": "Idle", "target": "measure temperature", "relation": "has sub-state"}, {"source": "Idle", "target": "compare with lower limit", "relation": "has sub-state"}, {"source": "AIModelingTools", "target": "StateDiagram", "relation": "generates"}, {"source": "AIChatbot", "target": "StateDiagram", "relation": "refines"}];
+const C={"concept":"#3b82f6","notation":"#8b5cf6","relationship":"#10b981","example":"#f59e0b","tool":"#ec4899"};
+
+const c=document.getElementById('c');
+const ctx=c.getContext('2d');
+const tp=document.getElementById('tp');
+const tpl=document.getElementById('tpl');
+const tpt=document.getElementById('tpt');
+
+function resize(){c.width=window.innerWidth;c.height=window.innerHeight-44}
+window.addEventListener('resize',resize);
+resize();
+
+const nm=new Map();
+N.forEach((n,i)=>{n.x=Math.random()*c.width;n.y=Math.random()*c.height;nm.set(n.id,n)});
+
+const ls=new Set();
+E.forEach(e=>{ls.add(e.source);ls.add(e.target)});
+
+// Simple force layout
+for(let t=0;t<100;t++){
+  E.forEach(e=>{let s=nm.get(e.source),t=nm.get(e.target);if(s&&t){let dx=t.x-s.x,dy=t.y-s.y,d=Math.sqrt(dx*dx+dy*dy)||1;let f=(d-150)*0.01;s.x+=f*dx/d;s.y+=f*dy/d;t.x-=f*dx/d;t.y-=f*dy/d}});
+  N.forEach((n,i)=>{N.forEach((m,j)=>{if(i!==j){let dx=m.x-n.x,dy=m.y-n.y,d=Math.sqrt(dx*dx+dy*dy)||1;if(d<40){let f=(40-d)*0.03;n.x-=f*dx/d;n.y-=f*dy/d;m.x+=f*dx/d;m.y+=f*dy/d}}})});
+  N.forEach(n=>{n.x=Math.max(20,Math.min(c.width-20,n.x));n.y=Math.max(20,Math.min(c.height-20,n.y))});
+}
+
+function draw(){
+  ctx.clearRect(0,0,c.width,c.height);
+  E.forEach(e=>{let s=nm.get(e.source),t=nm.get(e.target);if(s&&t){ctx.beginPath();ctx.moveTo(s.x,s.y);ctx.lineTo(t.x,t.y);ctx.strokeStyle='rgba(58,58,106,0.4)';ctx.stroke()}});
+  N.forEach(n=>{ctx.beginPath();ctx.arc(n.x,n.y,ls.has(n.id)?7:4,0,Math.PI*2);ctx.fillStyle=ls.has(n.id)?(C[n.type]||'#6b7280'):'#333';ctx.fill();ctx.fillStyle='#ccc';ctx.font='10px sans-serif';ctx.fillText(n.label||n.id,n.x+12,n.y+4)});
+}
+
+draw();
+
+c.addEventListener('mousemove',function(e){
+  let found=null;
+  N.forEach(n=>{let dx=e.clientX-n.x,dy=(e.clientY-44)-n.y;if(dx*dx+dy*dy<400)found=n});
+  if(found){tp.style.display='block';tp.style.left=(e.clientX+15)+'px';tp.style.top=(e.clientY-10)+'px';tpl.textContent=found.label||found.id;tpt.textContent=found.type||''}else{tp.style.display='none'}
+});
+
+c.addEventListener('touchstart',function(e){
+  let touch=e.touches[0];
+  let found=null;
+  N.forEach(n=>{let dx=touch.clientX-n.x,dy=(touch.clientY-44)-n.y;if(dx*dx+dy*dy<400)found=n});
+  if(found){tp.style.display='block';tp.style.left=(touch.clientX+15)+'px';tp.style.top=(touch.clientY-10)+'px';tpl.textContent=found.label||found.id;tpt.textContent=found.type||'';setTimeout(()=>tp.style.display='none',2000)}
+});
+</script>
+</body>
+</html>

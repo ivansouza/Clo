@@ -1,0 +1,281 @@
+{
+  "nodes": [
+    {
+      "id": "StateMachine",
+      "label": "State Machine",
+      "type": "concept"
+    },
+    {
+      "id": "State",
+      "label": "State",
+      "type": "concept"
+    },
+    {
+      "id": "Event",
+      "label": "Event",
+      "type": "concept"
+    },
+    {
+      "id": "GuardCondition",
+      "label": "Guard Condition",
+      "type": "concept"
+    },
+    {
+      "id": "Transition",
+      "label": "Transition",
+      "type": "concept"
+    },
+    {
+      "id": "Activity",
+      "label": "Activity",
+      "type": "concept"
+    },
+    {
+      "id": "Action",
+      "label": "Action",
+      "type": "concept"
+    },
+    {
+      "id": "InitialState",
+      "label": "Initial State",
+      "type": "concept"
+    },
+    {
+      "id": "FinalState",
+      "label": "Final State",
+      "type": "concept"
+    },
+    {
+      "id": "CompositeState",
+      "label": "Composite State",
+      "type": "concept"
+    },
+    {
+      "id": "SuperState",
+      "label": "Super-State",
+      "type": "concept"
+    },
+    {
+      "id": "SubState",
+      "label": "Sub-State",
+      "type": "concept"
+    },
+    {
+      "id": "ConcurrentSubStates",
+      "label": "Concurrent Sub-States",
+      "type": "concept"
+    },
+    {
+      "id": "Regions",
+      "label": "Regions",
+      "type": "concept"
+    },
+    {
+      "id": "HistoryState",
+      "label": "History State",
+      "type": "concept"
+    },
+    {
+      "id": "ActivityDiagram",
+      "label": "Activity Diagram",
+      "type": "concept"
+    },
+    {
+      "id": "Class",
+      "label": "Class",
+      "type": "concept"
+    },
+    {
+      "id": "Toaster",
+      "label": "Toaster",
+      "type": "example"
+    },
+    {
+      "id": "Off",
+      "label": "Off",
+      "type": "example"
+    },
+    {
+      "id": "On",
+      "label": "On",
+      "type": "example"
+    },
+    {
+      "id": "Working",
+      "label": "Working",
+      "type": "example"
+    },
+    {
+      "id": "Idle",
+      "label": "Idle",
+      "type": "example"
+    },
+    {
+      "id": "Burned",
+      "label": "Burned",
+      "type": "example"
+    },
+    {
+      "id": "AIModelingTools",
+      "label": "AI Modeling Tools",
+      "type": "tool"
+    },
+    {
+      "id": "AIChatbot",
+      "label": "AI Chatbot",
+      "type": "tool"
+    },
+    {
+      "id": "StateNotation",
+      "label": "State (rectangle with rounded corners)",
+      "type": "notation"
+    },
+    {
+      "id": "TransitionNotation",
+      "label": "Transition (solid directed line)",
+      "type": "notation"
+    },
+    {
+      "id": "HistoryStateNotation",
+      "label": "History State (circle with H inside)",
+      "type": "notation"
+    },
+    {
+      "id": "ConcurrentRegionsNotation",
+      "label": "Concurrent Regions (separated by dashed line)",
+      "type": "notation"
+    }
+  ],
+  "edges": [
+    {
+      "source": "StateMachine",
+      "target": "State",
+      "relation": "contains"
+    },
+    {
+      "source": "StateMachine",
+      "target": "Event",
+      "relation": "responds to"
+    },
+    {
+      "source": "StateMachine",
+      "target": "Transition",
+      "relation": "contains"
+    },
+    {
+      "source": "StateMachine",
+      "target": "InitialState",
+      "relation": "starts with"
+    },
+    {
+      "source": "StateMachine",
+      "target": "FinalState",
+      "relation": "ends with"
+    },
+    {
+      "source": "State",
+      "target": "CompositeState",
+      "relation": "can be"
+    },
+    {
+      "source": "CompositeState",
+      "target": "SubState",
+      "relation": "contains"
+    },
+    {
+      "source": "CompositeState",
+      "target": "ConcurrentSubStates",
+      "relation": "supports"
+    },
+    {
+      "source": "ConcurrentSubStates",
+      "target": "Regions",
+      "relation": "separated by"
+    },
+    {
+      "source": "CompositeState",
+      "target": "HistoryState",
+      "relation": "can have"
+    },
+    {
+      "source": "Transition",
+      "target": "Event",
+      "relation": "triggered by"
+    },
+    {
+      "source": "Transition",
+      "target": "GuardCondition",
+      "relation": "conditioned by"
+    },
+    {
+      "source": "Transition",
+      "target": "State",
+      "relation": "connects"
+    },
+    {
+      "source": "ActivityDiagram",
+      "target": "StateMachine",
+      "relation": "reducible to"
+    },
+    {
+      "source": "StateDiagram",
+      "target": "Class",
+      "relation": "associated with"
+    },
+    {
+      "source": "Toaster",
+      "target": "Off",
+      "relation": "has state"
+    },
+    {
+      "source": "Toaster",
+      "target": "On",
+      "relation": "has state"
+    },
+    {
+      "source": "Toaster",
+      "target": "Working",
+      "relation": "has state"
+    },
+    {
+      "source": "Toaster",
+      "target": "Idle",
+      "relation": "has state"
+    },
+    {
+      "source": "Toaster",
+      "target": "Burned",
+      "relation": "has state"
+    },
+    {
+      "source": "Working",
+      "target": "measure temperature",
+      "relation": "has sub-state"
+    },
+    {
+      "source": "Working",
+      "target": "compare with upper limit",
+      "relation": "has sub-state"
+    },
+    {
+      "source": "Idle",
+      "target": "measure temperature",
+      "relation": "has sub-state"
+    },
+    {
+      "source": "Idle",
+      "target": "compare with lower limit",
+      "relation": "has sub-state"
+    },
+    {
+      "source": "AIModelingTools",
+      "target": "StateDiagram",
+      "relation": "generates"
+    },
+    {
+      "source": "AIChatbot",
+      "target": "StateDiagram",
+      "relation": "refines"
+    }
+  ]
+}
