@@ -1,72 +1,148 @@
 <!DOCTYPE html>
-<html>
+<html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>State Diagrams Graph</title>
+<title>State Diagrams — Knowledge Graph</title>
 <style>
-*{margin:0;padding:0;box-sizing:border-box}
-body{font-family:sans-serif;background:#0a0a1a;color:#fff;overflow:hidden}
-#h{padding:10px 16px;background:rgba(10,10,26,.9);border-bottom:1px solid #1a1a3a;position:fixed;top:0;left:0;right:0;z-index:10;display:flex;align-items:center;gap:12px}
-#h h1{font-size:16px;color:#3b82f6}
-#h span{color:#666;font-size:12px}
-#c{display:block;margin-top:44px}
-.tp{position:fixed;background:#1a1a3a;border:1px solid #3a3a6a;border-radius:8px;padding:8px 12px;font-size:13px;display:none;pointer-events:none;z-index:20}
-.tp .lb{color:#3b82f6;font-weight:bold}
-.tp .ty{color:#888;font-size:11px}
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Inter', 'Segoe UI', sans-serif; background: #0a0a1a; color: #fff; overflow: hidden; }
+  #header { position: fixed; top: 0; left: 0; right: 0; z-index: 100; padding: 14px 24px;
+             background: rgba(10,10,26,0.92); backdrop-filter: blur(12px); border-bottom: 1px solid #1a1a3a;
+             display: flex; align-items: center; justify-content: space-between; }
+  #header .left { display: flex; align-items: center; gap: 12px; }
+  #header h1 { font-size: 18px; font-weight: 600; color: #3b82f6; }
+  #header .badge { background: #1a1a3a; color: #888; font-size: 12px; padding: 4px 10px; border-radius: 20px; }
+  #header .right { display: flex; gap: 8px; }
+  #header .btn { background: #1a1a3a; color: #aaa; border: 1px solid #2a2a5a; padding: 6px 14px; border-radius: 6px;
+                  font-size: 12px; cursor: pointer; transition: all .2s; }
+  #header .btn:hover { background: #2a2a5a; color: #fff; }
+  #stats { position: fixed; bottom: 20px; left: 20px; z-index: 100; font-size: 11px; color: #444; }
+  #tooltip { position: fixed; z-index: 200; background: rgba(20,20,50,0.96); border: 1px solid #3a3a6a;
+              border-radius: 10px; padding: 12px 16px; font-size: 13px; pointer-events: none; display: none;
+              max-width: 320px; box-shadow: 0 8px 32px rgba(0,0,0,0.6); backdrop-filter: blur(8px); }
+  #tooltip .label { color: #3b82f6; font-weight: 600; font-size: 14px; }
+  #tooltip .type { color: #888; font-size: 11px; margin-top: 2px; text-transform: uppercase; letter-spacing: .5px; }
+  #tooltip .rel { color: #555; font-size: 11px; margin-top: 6px; border-top: 1px solid #1a1a3a; padding-top: 6px; }
+  svg { width: 100vw; height: 100vh; }
+  .node { cursor: pointer; transition: opacity .2s; }
+  .node circle { stroke: rgba(255,255,255,0.3); stroke-width: 1.5px; transition: r .2s; }
+  .node:hover circle { stroke: #fff; stroke-width: 2px; }
+  .node text { font-size: 10px; fill: rgba(255,255,255,0.7); pointer-events: none;
+                text-shadow: 0 1px 4px rgba(0,0,0,0.8); }
+  .node:hover text { fill: #fff; }
+  .link { stroke: rgba(58,58,106,0.3); stroke-width: 1; }
+  .legend { position: fixed; bottom: 20px; right: 20px; z-index: 100; background: rgba(10,10,26,0.9);
+             border: 1px solid #1a1a3a; border-radius: 10px; padding: 12px 16px; font-size: 11px; }
+  .legend-item { display: flex; align-items: center; gap: 8px; margin: 4px 0; color: #888; }
+  .legend-dot { width: 10px; height: 10px; border-radius: 50%; }
 </style>
 </head>
 <body>
-<div id=h><h1>📐 State Diagrams</h1><span>29 nodes · 26 edges</span></div>
-<canvas id=c></canvas>
-<div class=tp id=tp><div class=lb id=tpl></div><div class=ty id=tpt></div></div>
+<div id="header">
+  <div class="left">
+    <h1>📐 State Diagrams</h1>
+    <span class="badge">29 nodes · 26 edges</span>
+  </div>
+  <div class="right">
+    <button class="btn" onclick="resetView()">⟲ Reset</button>
+    <button class="btn" onclick="autoLayout()">⟳ Layout</button>
+  </div>
+</div>
+<div id="stats">Arraste nós · Scroll para zoom</div>
+<div id="tooltip"></div>
+<svg id="graph"></svg>
+<div class="legend" id="legend"></div>
+
+<script src="https://d3js.org/d3.v7.min.js"></script>
 <script>
-const N=[{"id": "StateMachine", "label": "State Machine", "type": "concept"}, {"id": "State", "label": "State", "type": "concept"}, {"id": "Event", "label": "Event", "type": "concept"}, {"id": "GuardCondition", "label": "Guard Condition", "type": "concept"}, {"id": "Transition", "label": "Transition", "type": "concept"}, {"id": "Activity", "label": "Activity", "type": "concept"}, {"id": "Action", "label": "Action", "type": "concept"}, {"id": "InitialState", "label": "Initial State", "type": "concept"}, {"id": "FinalState", "label": "Final State", "type": "concept"}, {"id": "CompositeState", "label": "Composite State", "type": "concept"}, {"id": "SuperState", "label": "Super-State", "type": "concept"}, {"id": "SubState", "label": "Sub-State", "type": "concept"}, {"id": "ConcurrentSubStates", "label": "Concurrent Sub-States", "type": "concept"}, {"id": "Regions", "label": "Regions", "type": "concept"}, {"id": "HistoryState", "label": "History State", "type": "concept"}, {"id": "ActivityDiagram", "label": "Activity Diagram", "type": "concept"}, {"id": "Class", "label": "Class", "type": "concept"}, {"id": "Toaster", "label": "Toaster", "type": "example"}, {"id": "Off", "label": "Off", "type": "example"}, {"id": "On", "label": "On", "type": "example"}, {"id": "Working", "label": "Working", "type": "example"}, {"id": "Idle", "label": "Idle", "type": "example"}, {"id": "Burned", "label": "Burned", "type": "example"}, {"id": "AIModelingTools", "label": "AI Modeling Tools", "type": "tool"}, {"id": "AIChatbot", "label": "AI Chatbot", "type": "tool"}, {"id": "StateNotation", "label": "State (rectangle with rounded corners)", "type": "notation"}, {"id": "TransitionNotation", "label": "Transition (solid directed line)", "type": "notation"}, {"id": "HistoryStateNotation", "label": "History State (circle with H inside)", "type": "notation"}, {"id": "ConcurrentRegionsNotation", "label": "Concurrent Regions (separated by dashed line)", "type": "notation"}];
-const E=[{"source": "StateMachine", "target": "State", "relation": "contains"}, {"source": "StateMachine", "target": "Event", "relation": "responds to"}, {"source": "StateMachine", "target": "Transition", "relation": "contains"}, {"source": "StateMachine", "target": "InitialState", "relation": "starts with"}, {"source": "StateMachine", "target": "FinalState", "relation": "ends with"}, {"source": "State", "target": "CompositeState", "relation": "can be"}, {"source": "CompositeState", "target": "SubState", "relation": "contains"}, {"source": "CompositeState", "target": "ConcurrentSubStates", "relation": "supports"}, {"source": "ConcurrentSubStates", "target": "Regions", "relation": "separated by"}, {"source": "CompositeState", "target": "HistoryState", "relation": "can have"}, {"source": "Transition", "target": "Event", "relation": "triggered by"}, {"source": "Transition", "target": "GuardCondition", "relation": "conditioned by"}, {"source": "Transition", "target": "State", "relation": "connects"}, {"source": "ActivityDiagram", "target": "StateMachine", "relation": "reducible to"}, {"source": "StateDiagram", "target": "Class", "relation": "associated with"}, {"source": "Toaster", "target": "Off", "relation": "has state"}, {"source": "Toaster", "target": "On", "relation": "has state"}, {"source": "Toaster", "target": "Working", "relation": "has state"}, {"source": "Toaster", "target": "Idle", "relation": "has state"}, {"source": "Toaster", "target": "Burned", "relation": "has state"}, {"source": "Working", "target": "measure temperature", "relation": "has sub-state"}, {"source": "Working", "target": "compare with upper limit", "relation": "has sub-state"}, {"source": "Idle", "target": "measure temperature", "relation": "has sub-state"}, {"source": "Idle", "target": "compare with lower limit", "relation": "has sub-state"}, {"source": "AIModelingTools", "target": "StateDiagram", "relation": "generates"}, {"source": "AIChatbot", "target": "StateDiagram", "relation": "refines"}];
-const C={"concept":"#3b82f6","notation":"#8b5cf6","relationship":"#10b981","example":"#f59e0b","tool":"#ec4899"};
+const nodes = [{"id": "StateMachine", "label": "State Machine", "type": "concept"}, {"id": "State", "label": "State", "type": "concept"}, {"id": "Event", "label": "Event", "type": "concept"}, {"id": "GuardCondition", "label": "Guard Condition", "type": "concept"}, {"id": "Transition", "label": "Transition", "type": "concept"}, {"id": "Activity", "label": "Activity", "type": "concept"}, {"id": "Action", "label": "Action", "type": "concept"}, {"id": "InitialState", "label": "Initial State", "type": "concept"}, {"id": "FinalState", "label": "Final State", "type": "concept"}, {"id": "CompositeState", "label": "Composite State", "type": "concept"}, {"id": "SuperState", "label": "Super-State", "type": "concept"}, {"id": "SubState", "label": "Sub-State", "type": "concept"}, {"id": "ConcurrentSubStates", "label": "Concurrent Sub-States", "type": "concept"}, {"id": "Regions", "label": "Regions", "type": "concept"}, {"id": "HistoryState", "label": "History State", "type": "concept"}, {"id": "ActivityDiagram", "label": "Activity Diagram", "type": "concept"}, {"id": "Class", "label": "Class", "type": "concept"}, {"id": "Toaster", "label": "Toaster", "type": "example"}, {"id": "Off", "label": "Off", "type": "example"}, {"id": "On", "label": "On", "type": "example"}, {"id": "Working", "label": "Working", "type": "example"}, {"id": "Idle", "label": "Idle", "type": "example"}, {"id": "Burned", "label": "Burned", "type": "example"}, {"id": "AIModelingTools", "label": "AI Modeling Tools", "type": "tool"}, {"id": "AIChatbot", "label": "AI Chatbot", "type": "tool"}, {"id": "StateNotation", "label": "State (rectangle with rounded corners)", "type": "notation"}, {"id": "TransitionNotation", "label": "Transition (solid directed line)", "type": "notation"}, {"id": "HistoryStateNotation", "label": "History State (circle with H inside)", "type": "notation"}, {"id": "ConcurrentRegionsNotation", "label": "Concurrent Regions (separated by dashed line)", "type": "notation"}];
+const edges = [{"source": "StateMachine", "target": "State", "relation": "contains"}, {"source": "StateMachine", "target": "Event", "relation": "responds to"}, {"source": "StateMachine", "target": "Transition", "relation": "contains"}, {"source": "StateMachine", "target": "InitialState", "relation": "starts with"}, {"source": "StateMachine", "target": "FinalState", "relation": "ends with"}, {"source": "State", "target": "CompositeState", "relation": "can be"}, {"source": "CompositeState", "target": "SubState", "relation": "contains"}, {"source": "CompositeState", "target": "ConcurrentSubStates", "relation": "supports"}, {"source": "ConcurrentSubStates", "target": "Regions", "relation": "separated by"}, {"source": "CompositeState", "target": "HistoryState", "relation": "can have"}, {"source": "Transition", "target": "Event", "relation": "triggered by"}, {"source": "Transition", "target": "GuardCondition", "relation": "conditioned by"}, {"source": "Transition", "target": "State", "relation": "connects"}, {"source": "ActivityDiagram", "target": "StateMachine", "relation": "reducible to"}, {"source": "StateDiagram", "target": "Class", "relation": "associated with"}, {"source": "Toaster", "target": "Off", "relation": "has state"}, {"source": "Toaster", "target": "On", "relation": "has state"}, {"source": "Toaster", "target": "Working", "relation": "has state"}, {"source": "Toaster", "target": "Idle", "relation": "has state"}, {"source": "Toaster", "target": "Burned", "relation": "has state"}, {"source": "Working", "target": "measure temperature", "relation": "has sub-state"}, {"source": "Working", "target": "compare with upper limit", "relation": "has sub-state"}, {"source": "Idle", "target": "measure temperature", "relation": "has sub-state"}, {"source": "Idle", "target": "compare with lower limit", "relation": "has sub-state"}, {"source": "AIModelingTools", "target": "StateDiagram", "relation": "generates"}, {"source": "AIChatbot", "target": "StateDiagram", "relation": "refines"}];
 
-const c=document.getElementById('c');
-const ctx=c.getContext('2d');
-const tp=document.getElementById('tp');
-const tpl=document.getElementById('tpl');
-const tpt=document.getElementById('tpt');
+const colors = {
+  concept: '#3b82f6', notation: '#8b5cf6', relationship: '#10b981',
+  example: '#f59e0b', tool: '#ec4899'
+};
 
-function resize(){c.width=window.innerWidth;c.height=window.innerHeight-44}
-window.addEventListener('resize',resize);
-resize();
+const typeLabels = {
+  concept: 'Conceito', notation: 'Notação', relationship: 'Relação',
+  example: 'Exemplo', tool: 'Ferramenta'
+};
 
-const nm=new Map();
-N.forEach((n,i)=>{n.x=Math.random()*c.width;n.y=Math.random()*c.height;nm.set(n.id,n)});
+// Legend
+const legend = document.getElementById('legend');
+legend.innerHTML = Object.entries(typeLabels).map(([k,v]) =>
+  `<div class="legend-item"><div class="legend-dot" style="background:${colors[k]||'#666'}"></div>${v}</div>`
+).join('');
 
-const ls=new Set();
-E.forEach(e=>{ls.add(e.source);ls.add(e.target)});
+const width = window.innerWidth, height = window.innerHeight;
+const svg = d3.select('#graph');
+const g = svg.append('g');
 
-// Simple force layout
-for(let t=0;t<100;t++){
-  E.forEach(e=>{let s=nm.get(e.source),t=nm.get(e.target);if(s&&t){let dx=t.x-s.x,dy=t.y-s.y,d=Math.sqrt(dx*dx+dy*dy)||1;let f=(d-150)*0.01;s.x+=f*dx/d;s.y+=f*dy/d;t.x-=f*dx/d;t.y-=f*dy/d}});
-  N.forEach((n,i)=>{N.forEach((m,j)=>{if(i!==j){let dx=m.x-n.x,dy=m.y-n.y,d=Math.sqrt(dx*dx+dy*dy)||1;if(d<40){let f=(40-d)*0.03;n.x-=f*dx/d;n.y-=f*dy/d;m.x+=f*dx/d;m.y+=f*dy/d}}})});
-  N.forEach(n=>{n.x=Math.max(20,Math.min(c.width-20,n.x));n.y=Math.max(20,Math.min(c.height-20,n.y))});
-}
+const zoom = d3.zoom().scaleExtent([0.1, 5]).on('zoom', (e) => g.attr('transform', e.transform));
+svg.call(zoom);
 
-function draw(){
-  ctx.clearRect(0,0,c.width,c.height);
-  E.forEach(e=>{let s=nm.get(e.source),t=nm.get(e.target);if(s&&t){ctx.beginPath();ctx.moveTo(s.x,s.y);ctx.lineTo(t.x,t.y);ctx.strokeStyle='rgba(58,58,106,0.4)';ctx.stroke()}});
-  N.forEach(n=>{ctx.beginPath();ctx.arc(n.x,n.y,ls.has(n.id)?7:4,0,Math.PI*2);ctx.fillStyle=ls.has(n.id)?(C[n.type]||'#6b7280'):'#333';ctx.fill();ctx.fillStyle='#ccc';ctx.font='10px sans-serif';ctx.fillText(n.label||n.id,n.x+12,n.y+4)});
-}
+window.resetView = () => {
+  svg.transition().duration(500).call(zoom.transform, d3.zoomIdentity);
+};
 
-draw();
+const linkedNodes = new Set();
+edges.forEach(e => { linkedNodes.add(e.source); linkedNodes.add(e.target); });
 
-c.addEventListener('mousemove',function(e){
-  let found=null;
-  N.forEach(n=>{let dx=e.clientX-n.x,dy=(e.clientY-44)-n.y;if(dx*dx+dy*dy<400)found=n});
-  if(found){tp.style.display='block';tp.style.left=(e.clientX+15)+'px';tp.style.top=(e.clientY-10)+'px';tpl.textContent=found.label||found.id;tpt.textContent=found.type||''}else{tp.style.display='none'}
+const graphNodes = nodes.map(n => ({
+  ...n, x: width/2 + (Math.random()-0.5)*width*0.7, y: height/2 + (Math.random()-0.5)*height*0.6
+}));
+const graphEdges = edges.map(e => ({source: e.source, target: e.target, relation: e.relation || 'relates_to'}));
+
+const simulation = d3.forceSimulation(graphNodes)
+  .force('link', d3.forceLink(graphEdges).id(d => d.id).distance(150).strength(0.3))
+  .force('charge', d3.forceManyBody().strength(-400))
+  .force('center', d3.forceCenter(width/2, height/2))
+  .force('collision', d3.forceCollide().radius(d => 25 + (d.label ? d.label.length * 3 : 10)));
+
+const link = g.append('g').selectAll('line').data(graphEdges).join('line')
+  .attr('class', 'link').attr('stroke-width', d => Math.max(0.5, Math.min(2, (d.weight||1)*1.5)));
+
+const node = g.append('g').selectAll('g').data(graphNodes).join('g').attr('class', 'node')
+  .call(d3.drag()
+    .on('start', (e, d) => { if (!e.active) simulation.alphaTarget(0.3).restart(); d.fx = d.x; d.fy = d.y; })
+    .on('drag', (e, d) => { d.fx = e.x; d.fy = e.y; })
+    .on('end', (e, d) => { if (!e.active) simulation.alphaTarget(0); d.fx = null; d.fy = null; }));
+
+node.append('circle')
+  .attr('r', d => linkedNodes.has(d.id) ? 9 : 5)
+  .attr('fill', d => colors[d.type] || '#6b7280')
+  .attr('opacity', d => linkedNodes.has(d.id) ? 1 : 0.3);
+
+node.append('text')
+  .text(d => d.label || d.id)
+  .attr('dx', 14).attr('dy', 4)
+  .attr('opacity', d => linkedNodes.has(d.id) ? 1 : 0.2);
+
+// Tooltip
+const tooltip = d3.select('#tooltip');
+node.on('mouseover', (e, d) => {
+  const rels = graphEdges.filter(ed => ed.source.id === d.id || ed.target.id === d.id).slice(0, 5);
+  const relHtml = rels.length ? '<div class=rel>' + rels.map(r =>
+    r.source.id === d.id ? `→ ${r.target.label || r.target.id}` : `← ${r.source.label || r.source.id}`
+  ).join('<br>') + '</div>' : '';
+  tooltip.style('display', 'block')
+    .html(`<div class="label">${d.label || d.id}</div><div class="type">${typeLabels[d.type] || d.type}</div>${relHtml}`)
+    .style('left', (e.pageX + 18) + 'px').style('top', (e.pageY - 12) + 'px');
+  d3.select(this).select('circle').attr('r', d => linkedNodes.has(d.id) ? 12 : 7);
+}).on('mouseout', function() {
+  tooltip.style('display', 'none');
+  d3.select(this).select('circle').attr('r', d => linkedNodes.has(d.id) ? 9 : 5);
 });
 
-c.addEventListener('touchstart',function(e){
-  let touch=e.touches[0];
-  let found=null;
-  N.forEach(n=>{let dx=touch.clientX-n.x,dy=(touch.clientY-44)-n.y;if(dx*dx+dy*dy<400)found=n});
-  if(found){tp.style.display='block';tp.style.left=(touch.clientX+15)+'px';tp.style.top=(touch.clientY-10)+'px';tpl.textContent=found.label||found.id;tpt.textContent=found.type||'';setTimeout(()=>tp.style.display='none',2000)}
+window.autoLayout = () => {
+  simulation.alpha(1).restart();
+};
+
+simulation.on('tick', () => {
+  link.attr('x1', d => d.source.x).attr('y1', d => d.source.y)
+      .attr('x2', d => d.target.x).attr('y2', d => d.target.y);
+  node.attr('transform', d => `translate(${d.x},${d.y})`);
 });
 </script>
 </body>
