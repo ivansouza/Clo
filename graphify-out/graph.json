@@ -1,0 +1,257 @@
+{
+  "nodes": [
+    {
+      "id": "App",
+      "type": "Component",
+      "file": "src/App.tsx",
+      "description": "Root React component with error boundary and main UI logic"
+    },
+    {
+      "id": "ErrorBoundary",
+      "type": "Component",
+      "file": "src/App.tsx",
+      "description": "Error boundary to prevent white-screen crashes"
+    },
+    {
+      "id": "AppInner",
+      "type": "Component",
+      "file": "src/App.tsx",
+      "description": "Main UI component holding state and handlers"
+    },
+    {
+      "id": "main",
+      "type": "Entry",
+      "file": "src/main.tsx",
+      "description": "Application bootstrap entry point"
+    },
+    {
+      "id": "geminiService",
+      "type": "Service",
+      "file": "src/services/geminiService.ts",
+      "description": "Google Gemini AI service wrapper"
+    },
+    {
+      "id": "chatStream",
+      "type": "Function",
+      "file": "src/services/geminiService.ts",
+      "description": "Streams chat responses from Gemini"
+    },
+    {
+      "id": "connectLive",
+      "type": "Function",
+      "file": "src/services/geminiService.ts",
+      "description": "Establishes live audio session with Gemini"
+    },
+    {
+      "id": "generateTTSSpeech",
+      "type": "Function",
+      "file": "src/services/geminiService.ts",
+      "description": "Generates TTS audio from text"
+    },
+    {
+      "id": "analyzeImage",
+      "type": "Function",
+      "file": "src/services/geminiService.ts",
+      "description": "Analyzes an image with a prompt"
+    },
+    {
+      "id": "setApiKey",
+      "type": "Function",
+      "file": "src/services/geminiService.ts",
+      "description": "Sets the API key for Gemini"
+    },
+    {
+      "id": "getAI",
+      "type": "Function",
+      "file": "src/services/geminiService.ts",
+      "description": "Lazy initializer for GoogleGenAI instance"
+    },
+    {
+      "id": "index.css",
+      "type": "file",
+      "label": "index.css"
+    },
+    {
+      "id": "index.html",
+      "type": "file",
+      "label": "index.html"
+    },
+    {
+      "id": "vite.config.ts",
+      "type": "file",
+      "label": "vite.config.ts"
+    },
+    {
+      "id": "tailwindcss",
+      "type": "library",
+      "label": "tailwindcss"
+    },
+    {
+      "id": "react",
+      "type": "library",
+      "label": "react"
+    },
+    {
+      "id": "vite",
+      "type": "library",
+      "label": "vite"
+    },
+    {
+      "id": "vite-plugin-pwa",
+      "type": "library",
+      "label": "vite-plugin-pwa"
+    },
+    {
+      "id": "google-analytics",
+      "type": "service",
+      "label": "Google Analytics"
+    },
+    {
+      "id": "pwa-manifest",
+      "type": "config",
+      "label": "PWA Manifest"
+    },
+    {
+      "id": "theme-laranja",
+      "type": "theme",
+      "label": "theme-laranja"
+    },
+    {
+      "id": "theme-pink",
+      "type": "theme",
+      "label": "theme-pink"
+    },
+    {
+      "id": "glass-card",
+      "type": "utility",
+      "label": "glass-card"
+    },
+    {
+      "id": "atmosphere",
+      "type": "utility",
+      "label": "atmosphere"
+    }
+  ],
+  "edges": [
+    {
+      "source": "main",
+      "target": "App",
+      "type": "imports"
+    },
+    {
+      "source": "App",
+      "target": "ErrorBoundary",
+      "type": "renders"
+    },
+    {
+      "source": "ErrorBoundary",
+      "target": "AppInner",
+      "type": "renders"
+    },
+    {
+      "source": "AppInner",
+      "target": "chatStream",
+      "type": "calls"
+    },
+    {
+      "source": "AppInner",
+      "target": "analyzeImage",
+      "type": "calls"
+    },
+    {
+      "source": "AppInner",
+      "target": "generateTTSSpeech",
+      "type": "calls"
+    },
+    {
+      "source": "AppInner",
+      "target": "connectLive",
+      "type": "calls"
+    },
+    {
+      "source": "AppInner",
+      "target": "setApiKey",
+      "type": "calls"
+    },
+    {
+      "source": "chatStream",
+      "target": "getAI",
+      "type": "uses"
+    },
+    {
+      "source": "connectLive",
+      "target": "getAI",
+      "type": "uses"
+    },
+    {
+      "source": "generateTTSSpeech",
+      "target": "getAI",
+      "type": "uses"
+    },
+    {
+      "source": "analyzeImage",
+      "target": "getAI",
+      "type": "uses"
+    },
+    {
+      "source": "setApiKey",
+      "target": "getAI",
+      "type": "configures"
+    },
+    {
+      "source": "index.css",
+      "target": "tailwindcss",
+      "relation": "imports"
+    },
+    {
+      "source": "index.css",
+      "target": "theme-laranja",
+      "relation": "defines"
+    },
+    {
+      "source": "index.css",
+      "target": "theme-pink",
+      "relation": "defines"
+    },
+    {
+      "source": "index.css",
+      "target": "glass-card",
+      "relation": "defines"
+    },
+    {
+      "source": "index.css",
+      "target": "atmosphere",
+      "relation": "defines"
+    },
+    {
+      "source": "index.html",
+      "target": "google-analytics",
+      "relation": "uses"
+    },
+    {
+      "source": "vite.config.ts",
+      "target": "tailwindcss",
+      "relation": "uses"
+    },
+    {
+      "source": "vite.config.ts",
+      "target": "react",
+      "relation": "uses"
+    },
+    {
+      "source": "vite.config.ts",
+      "target": "vite",
+      "relation": "configures"
+    },
+    {
+      "source": "vite.config.ts",
+      "target": "vite-plugin-pwa",
+      "relation": "uses"
+    },
+    {
+      "source": "vite.config.ts",
+      "target": "pwa-manifest",
+      "relation": "defines"
+    }
+  ]
+}
