@@ -11,7 +11,6 @@ body{font-family:'Inter','Segoe UI',sans-serif;background:#0a0a1a;color:#fff;ove
 #h .l{display:flex;align-items:center;gap:12px}
 #h h1{font-size:18px;font-weight:600;color:#3b82f6}
 #h .b{background:#1a1a3a;color:#888;font-size:12px;padding:4px 10px;border-radius:20px}
-#h .r{display:flex;gap:8px}
 #h .btn{background:#1a1a3a;color:#aaa;border:1px solid #2a2a5a;padding:6px 14px;border-radius:6px;font-size:12px;cursor:pointer;transition:all .2s}
 #h .btn:hover{background:#2a2a5a;color:#fff}
 #s{position:fixed;bottom:20px;left:20px;z-index:100;font-size:11px;color:#444}
@@ -19,7 +18,7 @@ body{font-family:'Inter','Segoe UI',sans-serif;background:#0a0a1a;color:#fff;ove
 #tp .lb{color:#3b82f6;font-weight:600;font-size:14px}
 #tp .ty{color:#888;font-size:11px;margin-top:2px;text-transform:uppercase;letter-spacing:.5px}
 #tp .rl{color:#555;font-size:11px;margin-top:6px;border-top:1px solid #1a1a3a;padding-top:6px}
-svg{width:100vw;height:100vh}
+svg{width:100vw;height:100vh;display:block}
 .nd{cursor:pointer}
 .nd circle{stroke:rgba(255,255,255,.3);stroke-width:1.5px;transition:r .2s}
 .nd:hover circle{stroke:#fff;stroke-width:2px}
@@ -34,7 +33,7 @@ svg{width:100vw;height:100vh}
 <body>
 <div id=h>
   <div class=l><h1>📐 State Diagrams</h1><span class=b>29 nodes · 26 edges</span></div>
-  <div class=r><button class=btn onclick="rv()">⟲ Reset</button><button class=btn onclick="al()">⟳ Layout</button></div>
+  <button class=btn onclick="rv()">⟲ Reset Zoom</button>
 </div>
 <div id=s>Arraste nós · Scroll para zoom</div>
 <div id=tp></div>
@@ -56,7 +55,7 @@ svg.call(zm);
 window.rv=()=>{svg.transition().duration(500).call(zm.transform,d3.zoomIdentity)};
 const ls=new Set();E.forEach(e=>{ls.add(e.source);ls.add(e.target)});
 const GN=N.map(n=>({...n,x:W/2+(Math.random()-.5)*W*.7,y:H/2+(Math.random()-.5)*H*.6}));
-const GE=E.map(e=>({source:e.source,target:e.target,relation:e.relation||'relates_to'}));
+const GE=E.map(e=>{const s=typeof e.source=='object'?e.source.id:e.source;const t=typeof e.target=='object'?e.target.id:e.target;return{source:s,target:t,relation:e.relation||'relates_to'}});
 const sim=d3.forceSimulation(GN).force('link',d3.forceLink(GE).id(d=>d.id).distance(150).strength(.3)).force('charge',d3.forceManyBody().strength(-400)).force('center',d3.forceCenter(W/2,H/2)).force('collision',d3.forceCollide().radius(d=>25+(d.label?d.label.length*3:10)));
 const lk=g.append('g').selectAll('line').data(GE).join('line').attr('class','lk');
 const nd=g.append('g').selectAll('g').data(GN).join('g').attr('class','nd').call(d3.drag().on('start',(e,d)=>{if(!e.active)sim.alphaTarget(.3).restart();d.fx=d.x;d.fy=d.y}).on('drag',(e,d)=>{d.fx=e.x;d.fy=e.y}).on('end',(e,d)=>{if(!e.active)sim.alphaTarget(0);d.fx=null;d.fy=null}));
@@ -64,7 +63,6 @@ nd.append('circle').attr('r',d=>ls.has(d.id)?9:5).attr('fill',d=>C[d.type]||'#6b
 nd.append('text').text(d=>d.label||d.id).attr('dx',14).attr('dy',4).attr('opacity',d=>ls.has(d.id)?1:.2);
 const tp=d3.select('#tp');
 nd.on('mouseover',(e,d)=>{const rs=GE.filter(ed=>ed.source.id===d.id||ed.target.id===d.id).slice(0,5);const rh=rs.length?'<div class=rl>'+rs.map(r=>r.source.id===d.id?'→ '+(r.target.label||r.target.id):'← '+(r.source.label||r.source.id)).join('<br>')+'</div>':'';tp.style('display','block').html('<div class=lb>'+(d.label||d.id)+'</div><div class=ty>'+(TL[d.type]||d.type)+'</div>'+rh).style('left',(e.pageX+18)+'px').style('top',(e.pageY-12)+'px');d3.select(this).select('circle').attr('r',d=>ls.has(d.id)?12:7)}).on('mouseout',function(){tp.style('display','none');d3.select(this).select('circle').attr('r',d=>ls.has(d.id)?9:5)});
-window.al=()=>{sim.alpha(1).restart()};
 sim.on('tick',()=>{lk.attr('x1',d=>d.source.x).attr('y1',d=>d.source.y).attr('x2',d=>d.target.x).attr('y2',d=>d.target.y);nd.attr('transform',d=>`translate(${d.x},${d.y})`);});
 </script>
 </body>
