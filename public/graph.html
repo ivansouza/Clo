@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Clô AI - Knowledge Graph</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', sans-serif; background: #0a0a1a; color: #fff; overflow: hidden; }
+  #header { position: fixed; top: 0; left: 0; right: 0; z-index: 100; padding: 12px 20px;
+             background: rgba(10,10,26,0.9); backdrop-filter: blur(10px); border-bottom: 1px solid #1a1a3a; }
+  #header h1 { font-size: 18px; color: #f59e0b; }
+  #header span { color: #666; font-size: 13px; margin-left: 12px; }
+  #stats { position: fixed; bottom: 20px; left: 20px; z-index: 100; font-size: 12px; color: #555; }
+  #tooltip { position: fixed; z-index: 200; background: rgba(20,20,50,0.95); border: 1px solid #3a3a6a;
+              border-radius: 8px; padding: 10px 14px; font-size: 13px; pointer-events: none; display: none;
+              max-width: 300px; box-shadow: 0 4px 20px rgba(0,0,0,0.5); }
+  #tooltip .label { color: #f59e0b; font-weight: bold; }
+  #tooltip .type { color: #888; font-size: 11px; }
+  #tooltip .file { color: #555; font-size: 11px; margin-top: 4px; }
+  svg { width: 100vw; height: 100vh; }
+  .node { cursor: pointer; }
+  .node circle { stroke: #fff; stroke-width: 1.5px; }
+  .node text { font-size: 10px; fill: #ccc; pointer-events: none; }
+  .link { stroke: #3a3a6a; stroke-opacity: 0.4; }
+</style>
+</head>
+<body>
+<div id="header">
+  <h1>🤖 Clô AI — Knowledge Graph <span>24 nodes · 24 edges</span></h1>
+</div>
+<div id="stats">Arraste para navegar · Scroll para zoom</div>
+<div id="tooltip"></div>
+<svg id="graph"></svg>
+
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<script>
+const nodes = [{"id": "App", "type": "Component", "file": "src/App.tsx", "description": "Root React component with error boundary and main UI logic"}, {"id": "ErrorBoundary", "type": "Component", "file": "src/App.tsx", "description": "Error boundary to prevent white-screen crashes"}, {"id": "AppInner", "type": "Component", "file": "src/App.tsx", "description": "Main UI component holding state and handlers"}, {"id": "main", "type": "Entry", "file": "src/main.tsx", "description": "Application bootstrap entry point"}, {"id": "geminiService", "type": "Service", "file": "src/services/geminiService.ts", "description": "Google Gemini AI service wrapper"}, {"id": "chatStream", "type": "Function", "file": "src/services/geminiService.ts", "description": "Streams chat responses from Gemini"}, {"id": "connectLive", "type": "Function", "file": "src/services/geminiService.ts", "description": "Establishes live audio session with Gemini"}, {"id": "generateTTSSpeech", "type": "Function", "file": "src/services/geminiService.ts", "description": "Generates TTS audio from text"}, {"id": "analyzeImage", "type": "Function", "file": "src/services/geminiService.ts", "description": "Analyzes an image with a prompt"}, {"id": "setApiKey", "type": "Function", "file": "src/services/geminiService.ts", "description": "Sets the API key for Gemini"}, {"id": "getAI", "type": "Function", "file": "src/services/geminiService.ts", "description": "Lazy initializer for GoogleGenAI instance"}, {"id": "index.css", "type": "file", "label": "index.css"}, {"id": "index.html", "type": "file", "label": "index.html"}, {"id": "vite.config.ts", "type": "file", "label": "vite.config.ts"}, {"id": "tailwindcss", "type": "library", "label": "tailwindcss"}, {"id": "react", "type": "library", "label": "react"}, {"id": "vite", "type": "library", "label": "vite"}, {"id": "vite-plugin-pwa", "type": "library", "label": "vite-plugin-pwa"}, {"id": "google-analytics", "type": "service", "label": "Google Analytics"}, {"id": "pwa-manifest", "type": "config", "label": "PWA Manifest"}, {"id": "theme-laranja", "type": "theme", "label": "theme-laranja"}, {"id": "theme-pink", "type": "theme", "label": "theme-pink"}, {"id": "glass-card", "type": "utility", "label": "glass-card"}, {"id": "atmosphere", "type": "utility", "label": "atmosphere"}];
+const edges = [{"source": "main", "target": "App", "type": "imports"}, {"source": "App", "target": "ErrorBoundary", "type": "renders"}, {"source": "ErrorBoundary", "target": "AppInner", "type": "renders"}, {"source": "AppInner", "target": "chatStream", "type": "calls"}, {"source": "AppInner", "target": "analyzeImage", "type": "calls"}, {"source": "AppInner", "target": "generateTTSSpeech", "type": "calls"}, {"source": "AppInner", "target": "connectLive", "type": "calls"}, {"source": "AppInner", "target": "setApiKey", "type": "calls"}, {"source": "chatStream", "target": "getAI", "type": "uses"}, {"source": "connectLive", "target": "getAI", "type": "uses"}, {"source": "generateTTSSpeech", "target": "getAI", "type": "uses"}, {"source": "analyzeImage", "target": "getAI", "type": "uses"}, {"source": "setApiKey", "target": "getAI", "type": "configures"}, {"source": "index.css", "target": "tailwindcss", "relation": "imports"}, {"source": "index.css", "target": "theme-laranja", "relation": "defines"}, {"source": "index.css", "target": "theme-pink", "relation": "defines"}, {"source": "index.css", "target": "glass-card", "relation": "defines"}, {"source": "index.css", "target": "atmosphere", "relation": "defines"}, {"source": "index.html", "target": "google-analytics", "relation": "uses"}, {"source": "vite.config.ts", "target": "tailwindcss", "relation": "uses"}, {"source": "vite.config.ts", "target": "react", "relation": "uses"}, {"source": "vite.config.ts", "target": "vite", "relation": "configures"}, {"source": "vite.config.ts", "target": "vite-plugin-pwa", "relation": "uses"}, {"source": "vite.config.ts", "target": "pwa-manifest", "relation": "defines"}];
+
+const colors = {
+  'component': '#f59e0b', 'service': '#3b82f6', 'hook': '#10b981',
+  'config': '#8b5cf6', 'type': '#ec4899', 'utility': '#14b8a6',
+  'api': '#f97316', 'library': '#a855f7', 'file': '#6b7280',
+  'default': '#6b7280'
+};
+
+const width = window.innerWidth;
+const height = window.innerHeight;
+
+const svg = d3.select('#graph');
+const g = svg.append('g');
+
+svg.call(d3.zoom().scaleExtent([0.1, 4]).on('zoom', (e) => {
+  g.attr('transform', e.transform);
+}));
+
+const linkedNodes = new Set();
+edges.forEach(e => { linkedNodes.add(e.source); linkedNodes.add(e.target); });
+
+const graphNodes = nodes.map(n => ({...n, x: width/2 + (Math.random()-0.5)*width*0.6, y: height/2 + (Math.random()-0.5)*height*0.4}));
+const graphEdges = edges.map(e => ({source: e.source, target: e.target, relation: e.relation || 'relates_to'}));
+
+const simulation = d3.forceSimulation(graphNodes)
+  .force('link', d3.forceLink(graphEdges).id(d => d.id).distance(120))
+  .force('charge', d3.forceManyBody().strength(-300))
+  .force('center', d3.forceCenter(width/2, height/2))
+  .force('collision', d3.forceCollide().radius(d => 20 + (d.label ? d.label.length * 2 : 10)));
+
+const link = g.append('g').selectAll('line')
+  .data(graphEdges).join('line')
+  .attr('class', 'link').attr('stroke-width', 1);
+
+const node = g.append('g').selectAll('g')
+  .data(graphNodes).join('g').attr('class', 'node')
+  .call(d3.drag()
+    .on('start', (e, d) => { if (!e.active) simulation.alphaTarget(0.3).restart(); d.fx = d.x; d.fy = d.y; })
+    .on('drag', (e, d) => { d.fx = e.x; d.fy = e.y; })
+    .on('end', (e, d) => { if (!e.active) simulation.alphaTarget(0); d.fx = null; d.fy = null; }));
+
+node.append('circle')
+  .attr('r', d => linkedNodes.has(d.id) ? 8 : 5)
+  .attr('fill', d => colors[d.type] || colors.default)
+  .attr('opacity', d => linkedNodes.has(d.id) ? 1 : 0.4);
+
+node.append('text')
+  .text(d => d.label || d.id)
+  .attr('dx', 12).attr('dy', 4)
+  .attr('opacity', d => linkedNodes.has(d.id) ? 1 : 0.3);
+
+const tooltip = d3.select('#tooltip');
+node.on('mouseover', (e, d) => {
+  tooltip.style('display', 'block')
+    .html(`<div class="label">${d.label || d.id}</div><div class="type">${d.type || 'unknown'}</div>${d.source_file ? '<div class="file">' + d.source_file + '</div>' : ''}`)
+    .style('left', (e.pageX + 15) + 'px').style('top', (e.pageY - 10) + 'px');
+}).on('mouseout', () => tooltip.style('display', 'none'));
+
+simulation.on('tick', () => {
+  link.attr('x1', d => d.source.x).attr('y1', d => d.source.y)
+      .attr('x2', d => d.target.x).attr('y2', d => d.target.y);
+  node.attr('transform', d => `translate(${d.x},${d.y})`);
+});
+</script>
+</body>
+</html>
