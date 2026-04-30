@@ -6,13 +6,13 @@
 <title>State Diagrams</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{background:#0a0a1a;color:#fff;font-family:sans-serif;overflow:hidden}
-#h{padding:10px 16px;background:rgba(10,10,26,.9);border-bottom:1px solid #1a1a3a;display:flex;align-items:center;gap:10px;position:fixed;top:0;left:0;right:0;z-index:10}
+html,body{width:100%;height:100%;background:#0a0a1a;color:#fff;font-family:sans-serif;overflow:hidden}
+#h{padding:10px 16px;background:#0f0f2a;border-bottom:1px solid #1a1a3a;display:flex;align-items:center;gap:10px}
 #h h1{font-size:16px;color:#3b82f6}
 #h .b{color:#888;font-size:12px}
-svg{width:100vw;height:100vh;display:block}
-.nd circle{stroke:#fff;stroke-width:1;cursor:pointer}
-.nd text{font-size:9px;fill:#ccc;pointer-events:none}
+svg{width:100%;height:calc(100vh - 45px);background:#0a0a1a;display:block}
+.nd circle{stroke:rgba(255,255,255,.3);stroke-width:1;cursor:pointer}
+.nd text{font-size:9px;fill:#ccc;pointer-events:none;user-select:none}
 .lk{stroke:rgba(58,58,106,.3);stroke-width:.5}
 #tp{position:fixed;z-index:20;background:rgba(20,20,50,.95);border:1px solid #3a3a6a;border-radius:8px;padding:8px 12px;font-size:12px;display:none;pointer-events:none;max-width:280px}
 #tp .lb{color:#3b82f6;font-weight:bold}
@@ -21,26 +21,27 @@ svg{width:100vw;height:100vh;display:block}
 </head>
 <body>
 <div id=h><h1>📐 State Diagrams</h1><span class=b>29n 26e</span></div>
+<svg id=g xmlns="http://www.w3.org/2000/svg"></svg>
 <div id=tp></div>
-<svg id=g></svg>
 <script>
 var N=[{"id": "StateMachine", "label": "State Machine", "type": "concept"}, {"id": "State", "label": "State", "type": "concept"}, {"id": "Event", "label": "Event", "type": "concept"}, {"id": "GuardCondition", "label": "Guard Condition", "type": "concept"}, {"id": "Transition", "label": "Transition", "type": "concept"}, {"id": "Activity", "label": "Activity", "type": "concept"}, {"id": "Action", "label": "Action", "type": "concept"}, {"id": "InitialState", "label": "Initial State", "type": "concept"}, {"id": "FinalState", "label": "Final State", "type": "concept"}, {"id": "CompositeState", "label": "Composite State", "type": "concept"}, {"id": "SuperState", "label": "Super-State", "type": "concept"}, {"id": "SubState", "label": "Sub-State", "type": "concept"}, {"id": "ConcurrentSubStates", "label": "Concurrent Sub-States", "type": "concept"}, {"id": "Regions", "label": "Regions", "type": "concept"}, {"id": "HistoryState", "label": "History State", "type": "concept"}, {"id": "ActivityDiagram", "label": "Activity Diagram", "type": "concept"}, {"id": "Class", "label": "Class", "type": "concept"}, {"id": "Toaster", "label": "Toaster", "type": "example"}, {"id": "Off", "label": "Off", "type": "example"}, {"id": "On", "label": "On", "type": "example"}, {"id": "Working", "label": "Working", "type": "example"}, {"id": "Idle", "label": "Idle", "type": "example"}, {"id": "Burned", "label": "Burned", "type": "example"}, {"id": "AIModelingTools", "label": "AI Modeling Tools", "type": "tool"}, {"id": "AIChatbot", "label": "AI Chatbot", "type": "tool"}, {"id": "StateNotation", "label": "State (rectangle with rounded corners)", "type": "notation"}, {"id": "TransitionNotation", "label": "Transition (solid directed line)", "type": "notation"}, {"id": "HistoryStateNotation", "label": "History State (circle with H inside)", "type": "notation"}, {"id": "ConcurrentRegionsNotation", "label": "Concurrent Regions (separated by dashed line)", "type": "notation"}];
 var E=[{"source": "StateMachine", "target": "State", "relation": "contains"}, {"source": "StateMachine", "target": "Event", "relation": "responds to"}, {"source": "StateMachine", "target": "Transition", "relation": "contains"}, {"source": "StateMachine", "target": "InitialState", "relation": "starts with"}, {"source": "StateMachine", "target": "FinalState", "relation": "ends with"}, {"source": "State", "target": "CompositeState", "relation": "can be"}, {"source": "CompositeState", "target": "SubState", "relation": "contains"}, {"source": "CompositeState", "target": "ConcurrentSubStates", "relation": "supports"}, {"source": "ConcurrentSubStates", "target": "Regions", "relation": "separated by"}, {"source": "CompositeState", "target": "HistoryState", "relation": "can have"}, {"source": "Transition", "target": "Event", "relation": "triggered by"}, {"source": "Transition", "target": "GuardCondition", "relation": "conditioned by"}, {"source": "Transition", "target": "State", "relation": "connects"}, {"source": "ActivityDiagram", "target": "StateMachine", "relation": "reducible to"}, {"source": "StateDiagram", "target": "Class", "relation": "associated with"}, {"source": "Toaster", "target": "Off", "relation": "has state"}, {"source": "Toaster", "target": "On", "relation": "has state"}, {"source": "Toaster", "target": "Working", "relation": "has state"}, {"source": "Toaster", "target": "Idle", "relation": "has state"}, {"source": "Toaster", "target": "Burned", "relation": "has state"}, {"source": "Working", "target": "measure temperature", "relation": "has sub-state"}, {"source": "Working", "target": "compare with upper limit", "relation": "has sub-state"}, {"source": "Idle", "target": "measure temperature", "relation": "has sub-state"}, {"source": "Idle", "target": "compare with lower limit", "relation": "has sub-state"}, {"source": "AIModelingTools", "target": "StateDiagram", "relation": "generates"}, {"source": "AIChatbot", "target": "StateDiagram", "relation": "refines"}];
 var C={"concept":"#3b82f6","notation":"#8b5cf6","relationship":"#10b981","example":"#f59e0b","tool":"#ec4899"};
-var W=window.innerWidth,H=window.innerHeight;
 var svg=document.getElementById('g');
+var W=svg.clientWidth||window.innerWidth;
+var H=svg.clientHeight||window.innerHeight;
 var ns={},ls=new Set();
-N.forEach(function(n,i){n.x=W/2+(Math.random()-0.5)*W*0.6;n.y=H/2+(Math.random()-0.5)*H*0.6;ns[n.id]=n;});
+N.forEach(function(n,i){n.x=W/2+(Math.random()-0.5)*W*0.5;n.y=H/2+(Math.random()-0.5)*H*0.5;ns[n.id]=n;});
 E.forEach(function(e){ls.add(e.source);ls.add(e.target);});
-for(var t=0;t<150;t++){
+for(var t=0;t<200;t++){
   E.forEach(function(e){var s=ns[e.source],t=ns[e.target];if(s&&t){var dx=t.x-s.x,dy=t.y-s.y,d=Math.sqrt(dx*dx+dy*dy)||1;var f=(d-130)*0.005;s.x+=f*dx/d;s.y+=f*dy/d;t.x-=f*dx/d;t.y-=f*dy/d;}});
   N.forEach(function(n,i){N.forEach(function(m,j){if(i!==j){var dx=m.x-n.x,dy=m.y-n.y,d=Math.sqrt(dx*dx+dy*dy)||1;if(d<35){var f=(35-d)*0.03;n.x-=f*dx/d;n.y-=f*dy/d;m.x+=f*dx/d;m.y+=f*dy/d;}}})});
-  N.forEach(function(n){n.x+=((W/2)-n.x)*0.001;n.y+=((H/2)-n.y)*0.001;});
+  N.forEach(function(n){n.x=Math.max(20,Math.min(W-20,n.x));n.y=Math.max(20,Math.min(H-20,n.y));});
 }
-var html='';
-E.forEach(function(e){var s=ns[e.source],t=ns[e.target];if(s&&t)html+='<line class=lk x1='+s.x+' y1='+s.y+' x2='+t.x+' y2='+t.y+'/>';});
-N.forEach(function(n){var c=(ls.has(n.id)?'<circle r=8 fill='+(C[n.type]||'#666')+'/>':'<circle r=4 fill=#444/>');html+='<g class=nd transform=translate('+n.x+','+n.y+')>'+c+'<text dx=12 dy=3>'+(n.label||n.id)+'</text></g>';});
-svg.innerHTML=html;
+var ns2 = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+E.forEach(function(e){var s=ns[e.source],t=ns[e.target];if(s&&t){var l=document.createElementNS('http://www.w3.org/2000/svg','line');l.setAttribute('class','lk');l.setAttribute('x1',s.x);l.setAttribute('y1',s.y);l.setAttribute('x2',t.x);l.setAttribute('y2',t.y);ns2.appendChild(l);}});
+N.forEach(function(n){var g=document.createElementNS('http://www.w3.org/2000/svg','g');g.setAttribute('class','nd');var tr=document.createElementNS('http://www.w3.org/2000/svg','circle');tr.setAttribute('r',ls.has(n.id)?8:4);tr.setAttribute('fill',ls.has(n.id)?(C[n.type]||'#666'):'#444');g.appendChild(tr);var tx=document.createElementNS('http://www.w3.org/2000/svg','text');tx.setAttribute('dx',12);tx.setAttribute('dy',3);tx.textContent=n.label||n.id;g.appendChild(tx);g.setAttribute('transform','translate('+n.x+','+n.y+')');ns2.appendChild(g);});
+svg.appendChild(ns2);
 var tp=document.getElementById('tp');
 svg.querySelectorAll('.nd').forEach(function(el,i){
   el.addEventListener('mouseover',function(e){var n=N[i];tp.style.display='block';tp.innerHTML='<div class=lb>'+(n.label||n.id)+'</div><div class=ty>'+(n.type||'')+'</div>';tp.style.left=(e.pageX+12)+'px';tp.style.top=(e.pageY-8)+'px';this.querySelector('circle').setAttribute('r',ls.has(n.id)?12:6);});
@@ -48,4 +49,4 @@ svg.querySelectorAll('.nd').forEach(function(el,i){
 });
 </script>
 </body>
-</html><!-- graphify knowledge graph -->
+</html>
